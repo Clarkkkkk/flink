@@ -1,7 +1,7 @@
 ---
 title: "Built-In Functions"
 nav-parent_id: tableapi
-nav-pos: 45
+nav-pos: 31
 ---
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -30,7 +30,8 @@ If you think that the function is general enough, please <a href="https://issues
 {:toc}
 
 Scalar Functions
------------------------------
+----------------
+
 The scalar functions take zero, one or more values as the input and return a single value as the result.
 
 ### Comparison Functions
@@ -1381,6 +1382,17 @@ RAND_INTEGER(integer1, integer2)
       <p>Returns a pseudorandom integer value between 0 (inclusive) and the specified value (exclusive) with an initial seed. Two RAND_INTEGER functions will return identical sequences of numbers if they have the same initial seed and bound.</p>
     </td>
    </tr>
+
+    <tr>
+     <td>
+       {% highlight text %}
+UUID()
+{% endhighlight %}
+     </td>
+    <td>
+      <p>Returns an UUID (Universally Unique Identifier) string (e.g., "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.</p>
+    </td>
+   </tr>
     
     <tr>
       <td>
@@ -1391,6 +1403,19 @@ BIN(integer)
       <td>
         <p>Returns a string representation of <i>integer</i> in binary format. Returns NULL if <i>integer</i> is NULL.</p>
         <p>E.g. <code>BIN(4)</code> returns '100' and <code>BIN(12)</code> returns '1100'.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+{% highlight text %}
+HEX(numeric)
+HEX(string)
+      {% endhighlight %}
+      </td>
+      <td>
+        <p>Returns a string representation of an integer <i>numeric</i> value or a <i>string</i> in hex format. Returns NULL if the argument is NULL.</p>
+        <p>E.g. a numeric 20 leads to "14", a numeric 100 leads to "64", a string "hello,world" leads to "68656C6C6F2C776F726C64".</p>
       </td>
     </tr>
   </tbody>
@@ -1797,12 +1822,36 @@ randInteger(INTEGER1, INTEGER2)
     <tr>
      <td>
        {% highlight java %}
+uuid()
+{% endhighlight %}
+     </td>
+    <td>
+      <p>Returns an UUID (Universally Unique Identifier) string (e.g., "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.</p>
+    </td>
+   </tr>
+
+    <tr>
+     <td>
+       {% highlight java %}
 INTEGER.bin()
 {% endhighlight %}
      </td>
     <td>
       <p>Returns a string representation of <i>INTEGER</i> in binary format. Returns NULL if <i>INTEGER</i> is NULL.</p>
       <p>E.g., <code>4.bin()</code> returns "100" and <code>12.bin()</code> returns "1100".</p>
+    </td>
+   </tr>
+
+    <tr>
+      <td>
+       {% highlight java %}
+NUMERIC.hex()
+STRING.hex()
+{% endhighlight %}
+     </td>
+    <td>
+      <p>Returns a string representation of an integer <i>NUMERIC</i> value or a <i>STRING</i> in hex format. Returns NULL if the argument is NULL.</p>
+      <p>E.g. a numeric 20 leads to "14", a numeric 100 leads to "64", a string "hello,world" leads to "68656C6C6F2C776F726C64".</p>
     </td>
    </tr>
   </tbody>
@@ -2209,12 +2258,36 @@ randInteger(INTEGER1, INTEGER2)
     <tr>
      <td>
        {% highlight scala %}
+uuid()
+{% endhighlight %}
+     </td>
+    <td>
+      <p>Returns an UUID (Universally Unique Identifier) string (e.g., "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.</p>
+    </td>
+   </tr>
+
+    <tr>
+     <td>
+       {% highlight scala %}
 INTEGER.bin()
 {% endhighlight %}
      </td>
     <td>
       <p>Returns a string representation of <i>INTEGER</i> in binary format. Returns NULL if <i>INTEGER</i> is NULL.</p>
       <p>E.g., <code>4.bin()</code> returns "100" and <code>12.bin()</code> returns "1100".</p>
+    </td>
+   </tr>
+
+    <tr>
+      <td>
+       {% highlight scala %}
+NUMERIC.hex()
+STRING.hex()
+{% endhighlight %}
+     </td>
+    <td>
+      <p>Returns a string representation of an integer <i>NUMERIC</i> value or a <i>STRING</i> in hex format. Returns NULL if the argument is NULL.</p>
+      <p>E.g. a numeric 20 leads to "14", a numeric 100 leads to "64", a string "hello,world" leads to "68656C6C6F2C776F726C64".</p>
     </td>
    </tr>
   </tbody>
@@ -3231,21 +3304,34 @@ DATE_FORMAT(timestamp, string)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a string that formats <i>timestamp</i> with a specified format <i>string</i>. The format specification is given in the <a href="sql.html#date-format-specifier">Date Format Specifier table</a>.</p>
+        <p>Returns a string that formats <i>timestamp</i> with a specified format <i>string</i>. The format specification is given in the <a href="#date-format-specifiers">Date Format Specifier table</a>.</p>
       </td>
     </tr>
 
     <tr>
       <td>
         {% highlight text %}
-TIMESTAMPADD(unit, interval, timevalue)
+TIMESTAMPADD(timeintervalunit, interval, timepoint)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a new time value that adds a (signed) integer interval to <i>timevalue</i>. The unit for <i>interval</i> is given by the unit argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>WEEK</code>, <code>MONTH</code>, <code>QUARTER</code>, or <code>YEAR</code>.</p> 
+        <p>Returns a new time value that adds a (signed) integer interval to <i>timepoint</i>. The unit for <i>interval</i> is given by the unit argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>WEEK</code>, <code>MONTH</code>, <code>QUARTER</code>, or <code>YEAR</code>.</p> 
         <p>E.g., <code>TIMESTAMPADD(WEEK, 1, DATE '2003-01-02')</code> returns <code>2003-01-09</code>.</p>
       </td>
     </tr>
+
+    <tr>
+      <td>
+        {% highlight text %}
+TIMESTAMPDIFF(timepointunit, timepoint1, timepoint2)
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the (signed) number of <i>timepointunit</i> between <i>timepoint1</i> and <i>timepoint2</i>. The unit for the interval is given by the first argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>MONTH</code>, or <code>YEAR</code>. See also the <a href="#time-interval-and-point-unit-specifiers">Time Interval and Point Unit Specifiers table</a>.</p>
+        <p>E.g., <code>TIMESTAMPDIFF(DAY, TIMESTAMP '2003-01-02 10:00:00', TIMESTAMP '2003-01-03 10:00:00')</code> leads to <code>1</code>.</p>
+      </td>
+    </tr>
+
   </tbody>
 </table>
 </div>
@@ -3487,10 +3573,23 @@ dateFormat(TIMESTAMP, STRING)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a string that formats <i>TIMESTAMP</i> with a specified format <i>STRING</i>. The format specification is given in the <a href="sql.html#date-format-specifier">Date Format Specifier table</a>.</p>
+        <p>Returns a string that formats <i>TIMESTAMP</i> with a specified format <i>STRING</i>. The format specification is given in the <a href="#date-format-specifiers">Date Format Specifier table</a>.</p>
         <p>E.g., <code>dateFormat(ts, '%Y, %d %M')</code> results in strings formatted as "2017, 05 May".</p>
       </td>
     </tr>
+
+    <tr>
+      <td>
+        {% highlight java %}
+timestampDiff(TIMEPOINTUNIT, TIMEPOINT1, TIMEPOINT2)
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the (signed) number of <i>TIMEPOINTUNIT</i> between <i>TIMEPOINT1</i> and <i>TIMEPOINT2</i>. The unit for the interval is given by the first argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>MONTH</code>, or <code>YEAR</code>. See also the <a href="#time-interval-and-point-unit-specifiers">Time Interval and Point Unit Specifiers table</a>.</p>
+        <p>E.g., <code>timestampDiff(DAY, '2003-01-02 10:00:00'.toTimestamp, '2003-01-03 10:00:00'.toTimestamp)</code> leads to <code>1</code>.</p>
+      </td>
+    </tr>
+
     </tbody>
 </table>
 </div>
@@ -3732,10 +3831,23 @@ dateFormat(TIMESTAMP, STRING)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a string that formats <i>TIMESTAMP</i> with a specified format <i>STRING</i>. The format specification is given in the <a href="sql.html#date-format-specifier">Date Format Specifier table</a>.</p>
+        <p>Returns a string that formats <i>TIMESTAMP</i> with a specified format <i>STRING</i>. The format specification is given in the <a href="#date-format-specifiers">Date Format Specifier table</a>.</p>
         <p>E.g., <code>dateFormat('ts, "%Y, %d %M")</code> results in strings formatted as "2017, 05 May".</p>
       </td>
     </tr>
+
+    <tr>
+      <td>
+        {% highlight scala %}
+timestampDiff(TIMEPOINTUNIT, TIMEPOINT1, TIMEPOINT2)
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the (signed) number of <i>TIMEPOINTUNIT</i> between <i>TIMEPOINT1</i> and <i>TIMEPOINT2</i>. The unit for the interval is given by the first argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>MONTH</code>, or <code>YEAR</code>. See also the <a href="#time-interval-and-point-unit-specifiers">Time Interval and Point Unit Specifiers table</a>.</p>
+        <p>E.g., <code>timestampDiff(TimePointUnit.DAY, '2003-01-02 10:00:00'.toTimestamp, '2003-01-03 10:00:00'.toTimestamp)</code> leads to <code>1</code>.</p>
+      </td>
+    </tr>
+
   </tbody>
 </table>
 </div>
@@ -3915,7 +4027,7 @@ ANY.cast(TYPE)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a new <i>ANY</i> being cast to type <i>TYPE</i>. See the supported types <a href="sql.html#data-types">here</a>.</p>
+        <p>Returns a new <i>ANY</i> being cast to type <i>TYPE</i>. See the supported types <a href="tableApi.html#data-types">here</a>.</p>
         <p>E.g., <code>'42'.cast(INT)</code> returns 42.</p>
       </td>
     </tr>
@@ -3940,7 +4052,7 @@ ANY.cast(TYPE)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a new <i>ANY</i> being cast to type <i>TYPE</i>. See the supported types <a href="sql.html#data-types">here</a>.</p>
+        <p>Returns a new <i>ANY</i> being cast to type <i>TYPE</i>. See the supported types <a href="tableApi.html#data-types">here</a>.</p>
         <p>E.g., <code>"42".cast(Types.INT)</code> returns 42.</p>
       </td>
     </tr>
@@ -4863,7 +4975,8 @@ ANY.as(NAME1, NAME2, ...)
 </div>
 
 Aggregate Functions
------------------------------
+-------------------
+
 The aggregate functions take an expression across all the rows as the input and return a single aggregated value as the result. 
 
 <div class="codetabs" markdown="1">
@@ -5270,5 +5383,163 @@ FIELD.collect
 </table>
 </div>
 </div>
+
+{% top %}
+
+Date Format Specifiers
+----------------------
+
+The following table lists specifiers for date format functions.
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th class="text-left" style="width: 40%">Specifier</th>
+      <th class="text-center">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr><td>{% highlight text %}%a{% endhighlight %}</td>
+  <td>Abbreviated weekday name (<code>Sun</code> .. <code>Sat</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%b{% endhighlight %}</td>
+  <td>Abbreviated month name (<code>Jan</code> .. <code>Dec</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%c{% endhighlight %}</td>
+  <td>Month, numeric (<code>1</code> .. <code>12</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%D{% endhighlight %}</td>
+  <td>Day of the month with English suffix (<code>0th</code>, <code>1st</code>, <code>2nd</code>, <code>3rd</code>, ...)</td>
+  </tr>
+  <tr><td>{% highlight text %}%d{% endhighlight %}</td>
+  <td>Day of the month, numeric (<code>01</code> .. <code>31</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%e{% endhighlight %}</td>
+  <td>Day of the month, numeric (<code>1</code> .. <code>31</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%f{% endhighlight %}</td>
+  <td>Fraction of second (6 digits for printing: <code>000000</code> .. <code>999000</code>; 1 - 9 digits for parsing: <code>0</code> .. <code>999999999</code>) (Timestamp is truncated to milliseconds.) </td>
+  </tr>
+  <tr><td>{% highlight text %}%H{% endhighlight %}</td>
+  <td>Hour (<code>00</code> .. <code>23</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%h{% endhighlight %}</td>
+  <td>Hour (<code>01</code> .. <code>12</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%I{% endhighlight %}</td>
+  <td>Hour (<code>01</code> .. <code>12</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%i{% endhighlight %}</td>
+  <td>Minutes, numeric (<code>00</code> .. <code>59</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%j{% endhighlight %}</td>
+  <td>Day of year (<code>001</code> .. <code>366</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%k{% endhighlight %}</td>
+  <td>Hour (<code>0</code> .. <code>23</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%l{% endhighlight %}</td>
+  <td>Hour (<code>1</code> .. <code>12</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%M{% endhighlight %}</td>
+  <td>Month name (<code>January</code> .. <code>December</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%m{% endhighlight %}</td>
+  <td>Month, numeric (<code>01</code> .. <code>12</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%p{% endhighlight %}</td>
+  <td><code>AM</code> or <code>PM</code></td>
+  </tr>
+  <tr><td>{% highlight text %}%r{% endhighlight %}</td>
+  <td>Time, 12-hour (<code>hh:mm:ss</code> followed by <code>AM</code> or <code>PM</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%S{% endhighlight %}</td>
+  <td>Seconds (<code>00</code> .. <code>59</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%s{% endhighlight %}</td>
+  <td>Seconds (<code>00</code> .. <code>59</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%T{% endhighlight %}</td>
+  <td>Time, 24-hour (<code>hh:mm:ss</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%U{% endhighlight %}</td>
+  <td>Week (<code>00</code> .. <code>53</code>), where Sunday is the first day of the week</td>
+  </tr>
+  <tr><td>{% highlight text %}%u{% endhighlight %}</td>
+  <td>Week (<code>00</code> .. <code>53</code>), where Monday is the first day of the week</td>
+  </tr>
+  <tr><td>{% highlight text %}%V{% endhighlight %}</td>
+  <td>Week (<code>01</code> .. <code>53</code>), where Sunday is the first day of the week; used with <code>%X</code></td>
+  </tr>
+  <tr><td>{% highlight text %}%v{% endhighlight %}</td>
+  <td>Week (<code>01</code> .. <code>53</code>), where Monday is the first day of the week; used with <code>%x</code></td>
+  </tr>
+  <tr><td>{% highlight text %}%W{% endhighlight %}</td>
+  <td>Weekday name (<code>Sunday</code> .. <code>Saturday</code>)</td>
+  </tr>
+  <tr><td>{% highlight text %}%w{% endhighlight %}</td>
+  <td>Day of the week (<code>0</code> .. <code>6</code>), where Sunday is the first day of the week</td>
+  </tr>
+  <tr><td>{% highlight text %}%X{% endhighlight %}</td>
+  <td>Year for the week where Sunday is the first day of the week, numeric, four digits; used with <code>%V</code></td>
+  </tr>
+  <tr><td>{% highlight text %}%x{% endhighlight %}</td>
+  <td>Year for the week, where Monday is the first day of the week, numeric, four digits; used with <code>%v</code></td>
+  </tr>
+  <tr><td>{% highlight text %}%Y{% endhighlight %}</td>
+  <td>Year, numeric, four digits</td>
+  </tr>
+  <tr><td>{% highlight text %}%y{% endhighlight %}</td>
+  <td>Year, numeric (two digits) </td>
+  </tr>
+  <tr><td>{% highlight text %}%%{% endhighlight %}</td>
+  <td>A literal <code>%</code> character</td>
+  </tr>
+  <tr><td>{% highlight text %}%x{% endhighlight %}</td>
+  <td><code>x</code>, for any <code>x</code> not listed above</td>
+  </tr>
+  </tbody>
+</table>
+
+{% top %}
+
+Time Interval and Point Unit Specifiers
+---------------------------------------
+
+The following table lists specifiers for time interval and time point units. 
+
+For Table API, please use `_` for spaces (e.g., `DAY_TO_HOUR`).
+
+| Time Interval Unit       | Time Point Unit                |
+| :----------------------- | :----------------------------- |
+| `MILLENIUM` _(SQL-only)_ |                                |
+| `CENTURY` _(SQL-only)_   |                                |
+| `YEAR`                   | `YEAR`                         |
+| `YEAR TO MONTH`          |                                |
+| `QUARTER`                | `QUARTER`                      |
+| `MONTH`                  | `MONTH`                        |
+| `WEEK`                   | `WEEK`                         |
+| `DAY`                    | `DAY`                          |
+| `DAY TO HOUR`            |                                |
+| `DAY TO MINUTE`          |                                |
+| `DAY TO SECOND`          |                                |
+| `HOUR`                   | `HOUR`                         |
+| `HOUR TO MINUTE`         |                                |
+| `HOUR TO SECOND`         |                                |
+| `MINUTE`                 | `MINUTE`                       |
+| `MINUTE TO SECOND`       |                                |
+| `SECOND`                 | `SECOND`                       |
+|                          | `MILLISECOND`                  |
+|                          | `MICROSECOND`                  |
+| `DOY` _(SQL-only)_       |                                |
+| `DOW` _(SQL-only)_       |                                |
+|                          | `SQL_TSI_YEAR` _(SQL-only)_    |
+|                          | `SQL_TSI_QUARTER` _(SQL-only)_ |
+|                          | `SQL_TSI_MONTH` _(SQL-only)_   |
+|                          | `SQL_TSI_WEEK` _(SQL-only)_    |
+|                          | `SQL_TSI_DAY` _(SQL-only)_     |
+|                          | `SQL_TSI_HOUR` _(SQL-only)_    |
+|                          | `SQL_TSI_MINUTE` _(SQL-only)_  |
+|                          | `SQL_TSI_SECOND ` _(SQL-only)_ |
 
 {% top %}
