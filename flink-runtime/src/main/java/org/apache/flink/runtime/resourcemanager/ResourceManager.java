@@ -101,9 +101,6 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 	/** Unique id of the resource manager. */
 	private final ResourceID resourceId;
 
-	/** Configuration of the resource manager. */
-	private final ResourceManagerConfiguration resourceManagerConfiguration;
-
 	/** All currently registered JobMasterGateways scoped by JobID. */
 	private final Map<JobID, JobManagerRegistration> jobManagerRegistrations;
 
@@ -154,7 +151,6 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 			RpcService rpcService,
 			String resourceManagerEndpointId,
 			ResourceID resourceId,
-			ResourceManagerConfiguration resourceManagerConfiguration,
 			HighAvailabilityServices highAvailabilityServices,
 			HeartbeatServices heartbeatServices,
 			SlotManager slotManager,
@@ -166,7 +162,6 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 		super(rpcService, resourceManagerEndpointId);
 
 		this.resourceId = checkNotNull(resourceId);
-		this.resourceManagerConfiguration = checkNotNull(resourceManagerConfiguration);
 		this.highAvailabilityServices = checkNotNull(highAvailabilityServices);
 		this.slotManager = checkNotNull(slotManager);
 		this.metricRegistry = checkNotNull(metricRegistry);
@@ -676,7 +671,6 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 		});
 
 		return new JobMasterRegistrationSuccess(
-			resourceManagerConfiguration.getHeartbeatInterval().toMilliseconds(),
 			getFencingToken(),
 			resourceId);
 	}
@@ -735,7 +729,6 @@ public abstract class ResourceManager<WorkerType extends ResourceIDRetrievable>
 			return new TaskExecutorRegistrationSuccess(
 				registration.getInstanceID(),
 				resourceId,
-				resourceManagerConfiguration.getHeartbeatInterval().toMilliseconds(),
 				clusterInformation);
 		}
 	}
