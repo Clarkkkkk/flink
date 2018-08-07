@@ -579,6 +579,11 @@ trait ImplicitExpressionOperations {
     */
   def ltrim() = LTrim(expr)
 
+  /**
+    * Returns a string that removes the right whitespaces from the given string.
+    */
+  def rtrim() = RTrim(expr)
+
   // Temporal operations
 
   /**
