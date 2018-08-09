@@ -27,6 +27,8 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.translation.WrappingFunction;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.api.datastream.CoGroupedStreams.TaggedUnion;
+import org.apache.flink.streaming.api.operators.lookup.LookUpJoinOperator;
+import org.apache.flink.streaming.api.operators.lookup.LookupService;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
 import org.apache.flink.streaming.api.windowing.evictors.Evictor;
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
@@ -137,6 +139,7 @@ public class JoinedStreams<T1, T2> {
 			public <W extends Window> WithWindow<T1, T2, KEY, W> window(WindowAssigner<? super TaggedUnion<T1, T2>, W> assigner) {
 				return new WithWindow<>(input1, input2, keySelector1, keySelector2, keyType, assigner, null, null);
 			}
+
 		}
 	}
 

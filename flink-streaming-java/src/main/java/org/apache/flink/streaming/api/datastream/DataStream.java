@@ -64,6 +64,7 @@ import org.apache.flink.streaming.api.operators.StreamFilter;
 import org.apache.flink.streaming.api.operators.StreamFlatMap;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.api.operators.StreamSink;
+import org.apache.flink.streaming.api.operators.lookup.LookupService;
 import org.apache.flink.streaming.api.transformations.OneInputTransformation;
 import org.apache.flink.streaming.api.transformations.PartitionTransformation;
 import org.apache.flink.streaming.api.transformations.StreamTransformation;
@@ -708,6 +709,10 @@ public class DataStream<T> {
 	 */
 	public <T2> JoinedStreams<T, T2> join(DataStream<T2> otherStream) {
 		return new JoinedStreams<>(this, otherStream);
+	}
+
+	public <KEY, T2> LookupJoinedStream<T, T2, KEY> join(LookupService<KEY, T2> lookupService) {
+		return new LookupJoinedStream(this, lookupService);
 	}
 
 	/**
