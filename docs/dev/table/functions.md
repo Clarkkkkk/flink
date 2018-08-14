@@ -1382,17 +1382,6 @@ RAND_INTEGER(integer1, integer2)
       <p>Returns a pseudorandom integer value between 0 (inclusive) and the specified value (exclusive) with an initial seed. Two RAND_INTEGER functions will return identical sequences of numbers if they have the same initial seed and bound.</p>
     </td>
    </tr>
-
-    <tr>
-     <td>
-       {% highlight text %}
-UUID()
-{% endhighlight %}
-     </td>
-    <td>
-      <p>Returns an UUID (Universally Unique Identifier) string (e.g., "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.</p>
-    </td>
-   </tr>
     
     <tr>
       <td>
@@ -1822,17 +1811,6 @@ randInteger(INTEGER1, INTEGER2)
     <tr>
      <td>
        {% highlight java %}
-uuid()
-{% endhighlight %}
-     </td>
-    <td>
-      <p>Returns an UUID (Universally Unique Identifier) string (e.g., "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.</p>
-    </td>
-   </tr>
-
-    <tr>
-     <td>
-       {% highlight java %}
 INTEGER.bin()
 {% endhighlight %}
      </td>
@@ -2258,17 +2236,6 @@ randInteger(INTEGER1, INTEGER2)
     <tr>
      <td>
        {% highlight scala %}
-uuid()
-{% endhighlight %}
-     </td>
-    <td>
-      <p>Returns an UUID (Universally Unique Identifier) string (e.g., "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly generated) UUID. The UUID is generated using a cryptographically strong pseudo random number generator.</p>
-    </td>
-   </tr>
-
-    <tr>
-     <td>
-       {% highlight scala %}
 INTEGER.bin()
 {% endhighlight %}
      </td>
@@ -2374,54 +2341,6 @@ TRIM([ BOTH | LEADING | TRAILING ] string1 FROM string2)
       </td>
       <td>
         <p>Returns a string that removes leading and/or trailing characters <i>string1</i> from <i>string2</i>. By default, whitespaces at both sides are removed.</p>
-      </td>
-    </tr>
-    
-    <tr>
-      <td>
-        {% highlight text %}
-LTRIM(string)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that removes the left whitespaces from <i>string</i>.</p> 
-        <p>E.g., <code>LTRIM(' This is a test String.')</code> returns "This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight text %}
-RTRIM(string)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that removes the right whitespaces from <i>string</i>.</p> 
-        <p>E.g., <code>RTRIM('This is a test String. ')</code> returns "This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight text %}
-REPEAT(string, integer)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that repeats the base <i>string</i> <i>integer</i> times.</p> 
-        <p>E.g., <code>REPEAT('This is a test String.', 2)</code> returns "This is a test String.This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight text %}
-REGEXP_REPLACE(string1, string2, string3)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string from <i>string1</i> with all the substrings that match a regular expression <i>string2</i> consecutively being replaced with <i>string3</i>.</p> 
-        <p>E.g., <code>REGEXP_REPLACE('foobar', 'oo|ar', '')</code> returns "fb".</p>
       </td>
     </tr>
 
@@ -2618,54 +2537,6 @@ STRING1.trim()
     <tr>
       <td>
         {% highlight java %}
-STRING.ltrim()
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that removes the left whitespaces from <i>STRING</i>.</p> 
-        <p>E.g., <code>' This is a test String.'.ltrim()</code> returns "This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight java %}
-STRING.rtrim()
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that removes the right whitespaces from <i>STRING</i>.</p> 
-        <p>E.g., <code>'This is a test String. '.rtrim()</code> returns "This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight java %}
-STRING.repeat(INT)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that repeats the base <i>STRING</i> <i>INT</i> times.</p> 
-        <p>E.g., <code>'This is a test String.'.repeat(2)</code> returns "This is a test String.This is a test String.".</p>
-      </td>
-    </tr>    
-
-    <tr>
-      <td>
-        {% highlight java %}
-STRING1.regexpReplace(STRING2, STRING3)
-{% endhighlight %}
-      </td>
-       <td>
-         <p>Returns a string from <i>STRING1</i> with all the substrings that match a regular expression <i>STRING2</i> consecutively being replaced with <i>STRING3</i>.</p> 
-         <p>E.g., <code>'foobar'.regexpReplace('oo|ar', '')</code> returns "fb".</p>
-      </td>
-    </tr>
-    
-    <tr>
-      <td>
-        {% highlight java %}
 STRING1.overlay(STRING2, INT1)
 STRING1.overlay(STRING2, INT1, INT2)
 {% endhighlight %}
@@ -2770,6 +2641,7 @@ STRING.toBase64()
          <p>E.g., <code>'hello world'.toBase64()</code> returns "aGVsbG8gd29ybGQ=".</p>
       </td>
     </tr>
+    
   </tbody>
 </table>
 </div>
@@ -2851,54 +2723,6 @@ STRING.trim(
       </td>
       <td>
         <p>Returns a string that removes leading and/or trailing characters from <i>STRING</i>.</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight scala %}
-STRING.ltrim()
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that removes the left whitespaces from <i>STRING</i>.</p> 
-        <p>E.g., <code>" This is a test String.".ltrim()</code> returns "This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight scala %}
-STRING.rtrim()
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that removes the right whitespaces from <i>STRING</i>.</p> 
-        <p>E.g., <code>"This is a test String. ".rtrim()</code> returns "This is a test String.".</p>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        {% highlight scala %}
-STRING.repeat(INT)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns a string that repeats the base <i>STRING</i> <i>INT</i> times.</p> 
-        <p>E.g., <code>"This is a test String.".repeat(2)</code> returns "This is a test String.This is a test String.".</p>
-      </td>
-    </tr> 
-
-    <tr>
-      <td>
-        {% highlight scala %}
-STRING1.regexpReplace(STRING2, STRING3)
-{% endhighlight %}
-      </td>
-       <td>
-         <p>Returns a string from <i>STRING1</i> with all the substrings that match a regular expression <i>STRING2</i> consecutively being replaced with <i>STRING3</i>.</p> 
-         <p>E.g. <code>"foobar".regexpReplace("oo|ar", "")</code> returns "fb".</p>
       </td>
     </tr>
 
@@ -3311,27 +3135,14 @@ DATE_FORMAT(timestamp, string)
     <tr>
       <td>
         {% highlight text %}
-TIMESTAMPADD(timeintervalunit, interval, timepoint)
+TIMESTAMPADD(unit, interval, timevalue)
 {% endhighlight %}
       </td>
       <td>
-        <p>Returns a new time value that adds a (signed) integer interval to <i>timepoint</i>. The unit for <i>interval</i> is given by the unit argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>WEEK</code>, <code>MONTH</code>, <code>QUARTER</code>, or <code>YEAR</code>.</p> 
+        <p>Returns a new time value that adds a (signed) integer interval to <i>timevalue</i>. The unit for <i>interval</i> is given by the unit argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>WEEK</code>, <code>MONTH</code>, <code>QUARTER</code>, or <code>YEAR</code>.</p> 
         <p>E.g., <code>TIMESTAMPADD(WEEK, 1, DATE '2003-01-02')</code> returns <code>2003-01-09</code>.</p>
       </td>
     </tr>
-
-    <tr>
-      <td>
-        {% highlight text %}
-TIMESTAMPDIFF(timepointunit, timepoint1, timepoint2)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns the (signed) number of <i>timepointunit</i> between <i>timepoint1</i> and <i>timepoint2</i>. The unit for the interval is given by the first argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>MONTH</code>, or <code>YEAR</code>. See also the <a href="#time-interval-and-point-unit-specifiers">Time Interval and Point Unit Specifiers table</a>.</p>
-        <p>E.g., <code>TIMESTAMPDIFF(DAY, TIMESTAMP '2003-01-02 10:00:00', TIMESTAMP '2003-01-03 10:00:00')</code> leads to <code>1</code>.</p>
-      </td>
-    </tr>
-
   </tbody>
 </table>
 </div>
@@ -3577,19 +3388,6 @@ dateFormat(TIMESTAMP, STRING)
         <p>E.g., <code>dateFormat(ts, '%Y, %d %M')</code> results in strings formatted as "2017, 05 May".</p>
       </td>
     </tr>
-
-    <tr>
-      <td>
-        {% highlight java %}
-timestampDiff(TIMEPOINTUNIT, TIMEPOINT1, TIMEPOINT2)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns the (signed) number of <i>TIMEPOINTUNIT</i> between <i>TIMEPOINT1</i> and <i>TIMEPOINT2</i>. The unit for the interval is given by the first argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>MONTH</code>, or <code>YEAR</code>. See also the <a href="#time-interval-and-point-unit-specifiers">Time Interval and Point Unit Specifiers table</a>.</p>
-        <p>E.g., <code>timestampDiff(DAY, '2003-01-02 10:00:00'.toTimestamp, '2003-01-03 10:00:00'.toTimestamp)</code> leads to <code>1</code>.</p>
-      </td>
-    </tr>
-
     </tbody>
 </table>
 </div>
@@ -3835,19 +3633,6 @@ dateFormat(TIMESTAMP, STRING)
         <p>E.g., <code>dateFormat('ts, "%Y, %d %M")</code> results in strings formatted as "2017, 05 May".</p>
       </td>
     </tr>
-
-    <tr>
-      <td>
-        {% highlight scala %}
-timestampDiff(TIMEPOINTUNIT, TIMEPOINT1, TIMEPOINT2)
-{% endhighlight %}
-      </td>
-      <td>
-        <p>Returns the (signed) number of <i>TIMEPOINTUNIT</i> between <i>TIMEPOINT1</i> and <i>TIMEPOINT2</i>. The unit for the interval is given by the first argument, which should be one of the following values: <code>SECOND</code>, <code>MINUTE</code>, <code>HOUR</code>, <code>DAY</code>, <code>MONTH</code>, or <code>YEAR</code>. See also the <a href="#time-interval-and-point-unit-specifiers">Time Interval and Point Unit Specifiers table</a>.</p>
-        <p>E.g., <code>timestampDiff(TimePointUnit.DAY, '2003-01-02 10:00:00'.toTimestamp, '2003-01-03 10:00:00'.toTimestamp)</code> leads to <code>1</code>.</p>
-      </td>
-    </tr>
-
   </tbody>
 </table>
 </div>
@@ -5500,46 +5285,5 @@ The following table lists specifiers for date format functions.
   </tr>
   </tbody>
 </table>
-
-{% top %}
-
-Time Interval and Point Unit Specifiers
----------------------------------------
-
-The following table lists specifiers for time interval and time point units. 
-
-For Table API, please use `_` for spaces (e.g., `DAY_TO_HOUR`).
-
-| Time Interval Unit       | Time Point Unit                |
-| :----------------------- | :----------------------------- |
-| `MILLENIUM` _(SQL-only)_ |                                |
-| `CENTURY` _(SQL-only)_   |                                |
-| `YEAR`                   | `YEAR`                         |
-| `YEAR TO MONTH`          |                                |
-| `QUARTER`                | `QUARTER`                      |
-| `MONTH`                  | `MONTH`                        |
-| `WEEK`                   | `WEEK`                         |
-| `DAY`                    | `DAY`                          |
-| `DAY TO HOUR`            |                                |
-| `DAY TO MINUTE`          |                                |
-| `DAY TO SECOND`          |                                |
-| `HOUR`                   | `HOUR`                         |
-| `HOUR TO MINUTE`         |                                |
-| `HOUR TO SECOND`         |                                |
-| `MINUTE`                 | `MINUTE`                       |
-| `MINUTE TO SECOND`       |                                |
-| `SECOND`                 | `SECOND`                       |
-|                          | `MILLISECOND`                  |
-|                          | `MICROSECOND`                  |
-| `DOY` _(SQL-only)_       |                                |
-| `DOW` _(SQL-only)_       |                                |
-|                          | `SQL_TSI_YEAR` _(SQL-only)_    |
-|                          | `SQL_TSI_QUARTER` _(SQL-only)_ |
-|                          | `SQL_TSI_MONTH` _(SQL-only)_   |
-|                          | `SQL_TSI_WEEK` _(SQL-only)_    |
-|                          | `SQL_TSI_DAY` _(SQL-only)_     |
-|                          | `SQL_TSI_HOUR` _(SQL-only)_    |
-|                          | `SQL_TSI_MINUTE` _(SQL-only)_  |
-|                          | `SQL_TSI_SECOND ` _(SQL-only)_ |
 
 {% top %}
