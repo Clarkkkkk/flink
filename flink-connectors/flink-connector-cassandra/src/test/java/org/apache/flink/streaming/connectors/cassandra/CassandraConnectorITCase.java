@@ -36,7 +36,6 @@ import org.apache.flink.batch.connectors.cassandra.CassandraRowOutputFormat;
 import org.apache.flink.batch.connectors.cassandra.CassandraTupleOutputFormat;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.io.InputSplit;
-import org.apache.flink.runtime.testutils.CommonTestUtils;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -55,7 +54,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,6 @@ import static org.junit.Assert.assertTrue;
 public class CassandraConnectorITCase extends WriteAheadSinkTestBase<Tuple3<String, Integer, Integer>, CassandraTupleWriteAheadSink<Tuple3<String, Integer, Integer>>> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CassandraConnectorITCase.class);
-	private static File tmpDir;
 
 	private static final boolean EMBEDDED = true;
 
@@ -120,7 +120,6 @@ public class CassandraConnectorITCase extends WriteAheadSinkTestBase<Tuple3<Stri
 	private static final ArrayList<Tuple3<String, Integer, Integer>> collection = new ArrayList<>(20);
 	private static final ArrayList<Row> rowCollection = new ArrayList<>(20);
 
-	private static final String[] FIELD_NAMES = {"id", "counter", "batch_id"};
 	private static final TypeInformation[] FIELD_TYPES = {
 		BasicTypeInfo.STRING_TYPE_INFO, BasicTypeInfo.INT_TYPE_INFO, BasicTypeInfo.INT_TYPE_INFO};
 
@@ -145,16 +144,15 @@ public class CassandraConnectorITCase extends WriteAheadSinkTestBase<Tuple3<Stri
 		}
 	}
 
+	@ClassRule
+	public static final TemporaryFolder TEMPORARY_FOLDER = new TemporaryFolder();
+
 	@BeforeClass
 	public static void startCassandra() throws IOException {
 
-		// generate temporary files
-		tmpDir = CommonTestUtils.createTempDirectory();
 		ClassLoader classLoader = CassandraConnectorITCase.class.getClassLoader();
 		File file = new File(classLoader.getResource("cassandra.yaml").getFile());
-		File tmp = new File(tmpDir.getAbsolutePath() + File.separator + "cassandra.yaml");
-
-		assertTrue(tmp.createNewFile());
+		File tmp = TEMPORARY_FOLDER.newFile("cassandra.yaml");
 
 		try (
 			BufferedWriter b = new BufferedWriter(new FileWriter(tmp));
@@ -221,11 +219,6 @@ public class CassandraConnectorITCase extends WriteAheadSinkTestBase<Tuple3<Stri
 
 		if (cassandra != null) {
 			cassandra.stop();
-		}
-
-		if (tmpDir != null) {
-			//noinspection ResultOfMethodCallIgnored
-			tmpDir.delete();
 		}
 	}
 
