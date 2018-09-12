@@ -755,7 +755,6 @@ public class MiniCluster implements JobExecutorService, AutoCloseableAsync {
 			resourceManagerRpcService,
 			haServices,
 			heartbeatServices,
-			metricRegistry,
 			clusterInformation);
 
 			resourceManagerRunner.start();

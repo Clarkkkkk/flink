@@ -37,8 +37,6 @@ import org.apache.flink.runtime.jobmaster.JobMasterRegistrationSuccess;
 import org.apache.flink.runtime.leaderelection.TestingLeaderElectionService;
 import org.apache.flink.runtime.leaderretrieval.SettableLeaderRetrievalService;
 import org.apache.flink.runtime.messages.Acknowledge;
-import org.apache.flink.runtime.metrics.MetricRegistry;
-import org.apache.flink.runtime.metrics.NoOpMetricRegistry;
 import org.apache.flink.runtime.metrics.groups.UnregisteredMetricGroups;
 import org.apache.flink.runtime.registration.RegistrationResponse;
 import org.apache.flink.runtime.resourcemanager.JobLeaderIdService;
@@ -118,7 +116,6 @@ public class TaskExecutorITCase extends TestLogger {
 			testingHAServices,
 			rpcService.getScheduledExecutor(),
 			Time.minutes(5L));
-		MetricRegistry metricRegistry = NoOpMetricRegistry.INSTANCE;
 		HeartbeatServices heartbeatServices = new HeartbeatServices(1000L, 1000L);
 
 		final TaskManagerConfiguration taskManagerConfiguration = TaskManagerConfiguration.fromConfiguration(configuration);
@@ -146,7 +143,6 @@ public class TaskExecutorITCase extends TestLogger {
 			testingHAServices,
 			heartbeatServices,
 			slotManager,
-			metricRegistry,
 			jobLeaderIdService,
 			new ClusterInformation("localhost", 1234),
 			testingFatalErrorHandler);

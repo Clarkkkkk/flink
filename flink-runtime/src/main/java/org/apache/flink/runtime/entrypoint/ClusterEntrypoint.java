@@ -341,7 +341,6 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 				rpcService,
 				highAvailabilityServices,
 				heartbeatServices,
-				metricRegistry,
 				this,
 				clusterInformation,
 				webMonitorEndpoint.getRestBaseUrl());
@@ -674,7 +673,6 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 		RpcService rpcService,
 		HighAvailabilityServices highAvailabilityServices,
 		HeartbeatServices heartbeatServices,
-		MetricRegistry metricRegistry,
 		FatalErrorHandler fatalErrorHandler,
 		ClusterInformation clusterInformation,
 		@Nullable String webInterfaceUrl) throws Exception;

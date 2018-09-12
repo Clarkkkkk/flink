@@ -37,8 +37,6 @@ import org.apache.flink.runtime.highavailability.TestingHighAvailabilityServices
 import org.apache.flink.runtime.instance.HardwareDescription;
 import org.apache.flink.runtime.leaderelection.TestingLeaderElectionService;
 import org.apache.flink.runtime.messages.Acknowledge;
-import org.apache.flink.runtime.metrics.MetricRegistry;
-import org.apache.flink.runtime.metrics.NoOpMetricRegistry;
 import org.apache.flink.runtime.registration.RegistrationResponse;
 import org.apache.flink.runtime.resourcemanager.JobLeaderIdService;
 import org.apache.flink.runtime.resourcemanager.ResourceManagerGateway;
@@ -171,7 +169,6 @@ public class YarnResourceManagerTest extends TestLogger {
 				HighAvailabilityServices highAvailabilityServices,
 				HeartbeatServices heartbeatServices,
 				SlotManager slotManager,
-				MetricRegistry metricRegistry,
 				JobLeaderIdService jobLeaderIdService,
 				ClusterInformation clusterInformation,
 				FatalErrorHandler fatalErrorHandler,
@@ -187,7 +184,6 @@ public class YarnResourceManagerTest extends TestLogger {
 				highAvailabilityServices,
 				heartbeatServices,
 				slotManager,
-				metricRegistry,
 				jobLeaderIdService,
 				clusterInformation,
 				fatalErrorHandler,
@@ -268,7 +264,6 @@ public class YarnResourceManagerTest extends TestLogger {
 							rmServices.highAvailabilityServices,
 							rmServices.heartbeatServices,
 							rmServices.slotManager,
-							rmServices.metricRegistry,
 							rmServices.jobLeaderIdService,
 							new ClusterInformation("localhost", 1234),
 							testingFatalErrorHandler,
@@ -285,7 +280,6 @@ public class YarnResourceManagerTest extends TestLogger {
 			private final ScheduledExecutor scheduledExecutor;
 			private final TestingHighAvailabilityServices highAvailabilityServices;
 			private final HeartbeatServices heartbeatServices;
-			private final MetricRegistry metricRegistry;
 			private final TestingLeaderElectionService rmLeaderElectionService;
 			private final JobLeaderIdService jobLeaderIdService;
 			private final SlotManager slotManager;
@@ -298,7 +292,6 @@ public class YarnResourceManagerTest extends TestLogger {
 				rmLeaderElectionService = new TestingLeaderElectionService();
 				highAvailabilityServices.setResourceManagerLeaderElectionService(rmLeaderElectionService);
 				heartbeatServices = new TestingHeartbeatServices(5L, 5L, scheduledExecutor);
-				metricRegistry = NoOpMetricRegistry.INSTANCE;
 				slotManager = new SlotManager(
 						new ScheduledExecutorServiceAdapter(new DirectScheduledExecutorService()),
 						Time.seconds(10), Time.seconds(10), Time.minutes(1));
