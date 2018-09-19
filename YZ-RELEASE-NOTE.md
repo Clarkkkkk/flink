@@ -29,3 +29,8 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10105][hotfix][docs] Fixed documentation completeness test
     [FLINK-10185] Make ZooKeeperStateHandleStore#releaseAndTryRemove synchronous
     [FLINK-10011] Introduce SubmittedJobGraphStore#releaseJobGraph \ Release JobGraph after losing leadership in JobManager \ Release JobGraph from SubmittedJobGraphStore in Dispatcher
+    [FLINK-10189] Fix inefficient use of keySet iterators
+    [FLINK-10325] [State TTL] Refactor TtlListState to use only loops, no java stream API for performance
+    [hotfix][docs] Fix comment error in ZooKeeperSubmittedJobGraphStore
+    [FLINK-10321][network] Make the condition of broadcast partitioner simple (#6688)
+
