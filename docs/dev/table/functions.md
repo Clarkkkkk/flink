@@ -1200,6 +1200,18 @@ SIN(numeric)
     <tr>
       <td>
         {% highlight text %}
+SINH(numeric)
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the hyperbolic sine of <i>numeric</i>.</p> 
+        <p>The return type is <i>DOUBLE</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {% highlight text %}
 COS(numeric)
 {% endhighlight %}
       </td>
@@ -1630,6 +1642,18 @@ NUMERIC.sin()
       </td>
       <td>
         <p>Returns the sine of <i>NUMERIC</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {% highlight java %}
+NUMERIC.sinh()
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the hyperbolic sine of <i>NUMERIC</i>.</p> 
+        <p>The return type is <i>DOUBLE</i>.</p>
       </td>
     </tr>
 
@@ -2067,6 +2091,18 @@ NUMERIC.sin()
       </td>
       <td>
         <p>Returns the sine of <i>NUMERIC</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {% highlight scala %}
+NUMERIC.sinh()
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the hyperbolic sine of <i>NUMERIC</i>.</p> 
+        <p>The return type is <i>DOUBLE</i>.</p>
       </td>
     </tr>
 
