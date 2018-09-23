@@ -1222,6 +1222,18 @@ TAN(numeric)
     <tr>
       <td>
         {% highlight text %}
+TANH(numeric)
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the hyperbolic tangent of <i>numeric</i>.</p> 
+        <p>The return type is <i>DOUBLE</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {% highlight text %}
 COT(numeric)
 {% endhighlight %}
       </td>
@@ -1640,6 +1652,18 @@ NUMERIC.tan()
       </td>
       <td>
         <p>Returns the tangent of <i>NUMERIC</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {% highlight java %}
+NUMERIC.tanh()
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the hyperbolic tangent of <i>NUMERIC</i>.</p> 
+        <p>The return type is <i>DOUBLE</i>.</p>
       </td>
     </tr>
 
@@ -2065,6 +2089,18 @@ NUMERIC.tan()
       </td>
       <td>
         <p>Returns the tangent of <i>NUMERIC</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        {% highlight scala %}
+NUMERIC.tanh()
+{% endhighlight %}
+      </td>
+      <td>
+        <p>Returns the hyperbolic tangent of <i>NUMERIC</i>.</p> 
+        <p>The return type is <i>DOUBLE</i>.</p>
       </td>
     </tr>
 
