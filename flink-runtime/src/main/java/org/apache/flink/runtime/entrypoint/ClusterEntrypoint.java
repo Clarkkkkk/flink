@@ -49,6 +49,7 @@ import org.apache.flink.runtime.metrics.MetricRegistryImpl;
 import org.apache.flink.runtime.resourcemanager.ResourceManager;
 import org.apache.flink.runtime.rpc.FatalErrorHandler;
 import org.apache.flink.runtime.rpc.RpcService;
+import org.apache.flink.runtime.rpc.akka.AkkaExecutorMode;
 import org.apache.flink.runtime.rpc.akka.AkkaRpcService;
 import org.apache.flink.runtime.security.SecurityConfiguration;
 import org.apache.flink.runtime.security.SecurityContext;
@@ -127,6 +128,9 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 
 	@GuardedBy("lock")
 	private RpcService commonRpcService;
+
+	@GuardedBy("lock")
+	private RpcService metricQueryRpcService;
 
 	@GuardedBy("lock")
 	private ArchivedExecutionGraphStore archivedExecutionGraphStore;
@@ -251,6 +255,13 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 			configuration.setString(JobManagerOptions.ADDRESS, commonRpcService.getAddress());
 			configuration.setInteger(JobManagerOptions.PORT, commonRpcService.getPort());
 
+			final String metricPortRange = getMetricQueryServiceRPCPortRange(configuration);
+			metricQueryRpcService = createRpcService(
+				configuration,
+				bindAddress,
+				metricPortRange,
+				AkkaExecutorMode.SINGLE_THREAD_EXECUTOR);
+
 			haServices = createHaServices(configuration, commonRpcService.getExecutor());
 			blobServer = new BlobServer(configuration, haServices.createBlobStore());
 			blobServer.start();
@@ -259,8 +270,8 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 
 			// TODO: This is a temporary hack until we have ported the MetricQueryService to the new RpcEndpoint
 			// start the MetricQueryService
-			final ActorSystem actorSystem = ((AkkaRpcService) commonRpcService).getActorSystem();
-			metricRegistry.startQueryService(actorSystem, null);
+			final ActorSystem metricQueryServiceActorSystem = ((AkkaRpcService) metricQueryRpcService).getActorSystem();
+			metricRegistry.startQueryService(metricQueryServiceActorSystem, null);
 
 			archivedExecutionGraphStore = createSerializableExecutionGraphStore(configuration, commonRpcService.getScheduledExecutor());
 
@@ -286,13 +297,25 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 		}
 	}
 
+	protected String getMetricQueryServiceRPCPortRange(Configuration configuration) {
+		return String.valueOf(configuration.getInteger(JobManagerOptions.METRIC_REGISTRY_SERVICE_PORT));
+	}
+
+	protected RpcService createRpcService(
+		Configuration configuration,
+		String bindAddress,
+		String portRange,
+		AkkaExecutorMode executorMode) throws Exception {
+		ActorSystem actorSystem = BootstrapTools.startActorSystem(configuration, bindAddress, portRange, LOG);
+		FiniteDuration duration = AkkaUtils.getTimeout(configuration);
+		return new AkkaRpcService(actorSystem, Time.of(duration.length(), duration.unit()));
+	}
+
 	protected RpcService createRpcService(
 			Configuration configuration,
 			String bindAddress,
 			String portRange) throws Exception {
-		ActorSystem actorSystem = BootstrapTools.startActorSystem(configuration, bindAddress, portRange, LOG);
-		FiniteDuration duration = AkkaUtils.getTimeout(configuration);
-		return new AkkaRpcService(actorSystem, Time.of(duration.length(), duration.unit()));
+		return createRpcService(configuration, bindAddress, portRange, AkkaExecutorMode.FORK_JOIN_EXECUTOR);
 	}
 
 	protected HighAvailabilityServices createHaServices(
@@ -356,6 +379,10 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 
 			if (metricRegistry != null) {
 				terminationFutures.add(metricRegistry.shutdown());
+			}
+
+			if (metricQueryRpcService != null) {
+				terminationFutures.add(metricQueryRpcService.stopService());
 			}
 
 			if (commonRpcService != null) {
