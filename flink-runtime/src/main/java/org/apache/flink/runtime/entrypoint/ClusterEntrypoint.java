@@ -297,8 +297,17 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 		}
 	}
 
+	/** returns the port range for the metric query {@RpcService}.
+	 *
+	 * @param configuration configuration to extract the port range from
+	 * @return Port range for the metric query {@link RpcService}
+	 */
 	protected String getMetricQueryServiceRPCPortRange(Configuration configuration) {
-		return String.valueOf(configuration.getInteger(JobManagerOptions.METRIC_REGISTRY_SERVICE_PORT));
+		if (ZooKeeperUtils.isZooKeeperRecoveryMode(configuration)) {
+			return configuration.getString(HighAvailabilityOptions.HA_JOB_MANAGER_METRIC_QUERY_PORT_RANGE);
+		} else {
+			return String.valueOf(configuration.getInteger(JobManagerOptions.METRIC_REGISTRY_SERVICE_PORT));
+		}
 	}
 
 	protected RpcService createRpcService(
