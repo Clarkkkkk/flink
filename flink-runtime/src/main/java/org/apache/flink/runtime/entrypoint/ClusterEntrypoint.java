@@ -297,7 +297,7 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 		}
 	}
 
-	/** returns the port range for the metric query {@RpcService}.
+	/** Returns the port range for the metric query {@RpcService}.
 	 *
 	 * @param configuration configuration to extract the port range from
 	 * @return Port range for the metric query {@link RpcService}
@@ -321,9 +321,9 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 	}
 
 	protected RpcService createRpcService(
-			Configuration configuration,
-			String bindAddress,
-			String portRange) throws Exception {
+		Configuration configuration,
+		String bindAddress,
+		String portRange) throws Exception {
 		return createRpcService(configuration, bindAddress, portRange, AkkaExecutorMode.FORK_JOIN_EXECUTOR);
 	}
 
@@ -429,9 +429,9 @@ public abstract class ClusterEntrypoint implements FatalErrorHandler {
 	}
 
 	private CompletableFuture<ApplicationStatus> shutDownAsync(
-			ApplicationStatus applicationStatus,
-			@Nullable String diagnostics,
-			boolean cleanupHaData) {
+		ApplicationStatus applicationStatus,
+		@Nullable String diagnostics,
+		boolean cleanupHaData) {
 		if (isShutDown.compareAndSet(false, true)) {
 			LOG.info("Shutting {} down with application status {}. Diagnostics {}.",
 				getClass().getSimpleName(),
