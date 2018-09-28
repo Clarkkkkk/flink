@@ -118,11 +118,11 @@ object AkkaUtils {
   }
 
   /**
-    * Return a remote Akka config for the given configuration values.
+    * Returns a remote Akka config for the given configuration values.
     *
     * @param configuration containing the user provided configuration values
     * @param hostname to bind against. If null, then the loopback interface is used
-    * @param port to bind against\
+    * @param port to bind against
     * @param executorMode containing the user specified mode of executor
     * @return A remote Akka config
     */
@@ -134,7 +134,7 @@ object AkkaUtils {
   }
 
   /**
-    * Return a remote Akka config for the given configuration values.
+    * Returns a remote Akka config for the given configuration values.
     *
     * @param configuration containing the user provided configuration values
     * @param hostname to bind against. If null, then the loopback interface is used
@@ -330,35 +330,35 @@ object AkkaUtils {
 
     val config =
       s"""
-         |akka {
-         | daemonic = off
-         |
+        |akka {
+        | daemonic = off
+        |
         | loggers = ["akka.event.slf4j.Slf4jLogger"]
-         | logging-filter = "akka.event.slf4j.Slf4jLoggingFilter"
-         | log-config-on-start = off
-         |
+        | logging-filter = "akka.event.slf4j.Slf4jLoggingFilter"
+        | log-config-on-start = off
+        |
         | jvm-exit-on-fatal-error = $jvmExitOnFatalError
-         |
+        |
         | serialize-messages = off
-         |
+        |
         | loglevel = $logLevel
-         | stdout-loglevel = OFF
-         |
+        | stdout-loglevel = OFF
+        |
         | log-dead-letters = $logLifecycleEvents
-         | log-dead-letters-during-shutdown = $logLifecycleEvents
-         |
+        | log-dead-letters-during-shutdown = $logLifecycleEvents
+        |
         | actor {
-         |   guardian-supervisor-strategy = $supervisorStrategy
-         |
+        |   guardian-supervisor-strategy = $supervisorStrategy
+        |
         |   warn-about-java-serializer-usage = off
-         |
+        |
         |   default-dispatcher {
-         |     throughput = $akkaThroughput
-         |
+        |     throughput = $akkaThroughput
+        |
         |   $executorConfig
-         |   }
-         | }
-         |}
+        |   }
+        | }
+        |}
       """.stripMargin
 
     ConfigFactory.parseString(config)
