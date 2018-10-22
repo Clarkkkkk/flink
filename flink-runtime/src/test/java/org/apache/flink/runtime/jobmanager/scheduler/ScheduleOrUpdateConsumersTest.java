@@ -28,16 +28,15 @@ import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.runtime.jobgraph.JobVertex;
 import org.apache.flink.runtime.jobgraph.tasks.AbstractInvokable;
 import org.apache.flink.runtime.jobmanager.SlotCountExceedingParallelismTest;
-import org.apache.flink.runtime.minicluster.MiniCluster;
-import org.apache.flink.runtime.minicluster.MiniClusterConfiguration;
 import org.apache.flink.runtime.testingUtils.TestingUtils;
+import org.apache.flink.runtime.testutils.MiniClusterResource;
+import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.types.IntValue;
 import org.apache.flink.util.TestLogger;
 
 import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.util.List;
@@ -50,29 +49,19 @@ public class ScheduleOrUpdateConsumersTest extends TestLogger {
 	private static final int NUMBER_OF_SLOTS_PER_TM = 2;
 	private static final int PARALLELISM = NUMBER_OF_TMS * NUMBER_OF_SLOTS_PER_TM;
 
-	private static MiniCluster flink;
+	@ClassRule
+	public static final MiniClusterResource MINI_CLUSTER_RESOURCE = new MiniClusterResource(
+		new MiniClusterResourceConfiguration.Builder()
+			.setConfiguration(getFlinkConfiguration())
+			.setNumberTaskManagers(NUMBER_OF_TMS)
+			.setNumberSlotsPerTaskManager(NUMBER_OF_SLOTS_PER_TM)
+			.build());
 
-	@BeforeClass
-	public static void setUp() throws Exception {
+	private static Configuration getFlinkConfiguration() {
 		final Configuration config = new Configuration();
 		config.setString(AkkaOptions.ASK_TIMEOUT, TestingUtils.DEFAULT_AKKA_ASK_TIMEOUT());
 
-		final MiniClusterConfiguration miniClusterConfiguration = new MiniClusterConfiguration.Builder()
-			.setConfiguration(config)
-			.setNumTaskManagers(NUMBER_OF_TMS)
-			.setNumSlotsPerTaskManager(NUMBER_OF_SLOTS_PER_TM)
-			.build();
-
-		flink = new MiniCluster(miniClusterConfiguration);
-
-		flink.start();
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		if (flink != null) {
-			flink.close();
-		}
+		return config;
 	}
 
 	/**
@@ -131,7 +120,7 @@ public class ScheduleOrUpdateConsumersTest extends TestLogger {
 				pipelinedReceiver,
 				blockingReceiver);
 
-		flink.executeJobBlocking(jobGraph);
+		MINI_CLUSTER_RESOURCE.getMiniCluster().executeJobBlocking(jobGraph);
 	}
 
 	// ---------------------------------------------------------------------------------------------
