@@ -116,7 +116,7 @@ class FlinkPlannerImpl(
       // root = root.withRel(RelTimeIndicatorConverter.convert(root.rel, rexBuilder))
       root
     } catch {
-      case e: RelConversionException => throw TableException(e.getMessage)
+      case e: RelConversionException => throw new TableException(e.getMessage)
     }
   }
 
