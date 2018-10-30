@@ -23,6 +23,7 @@ import org.apache.flink.api.java.Utils;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.api.functions.async.AsyncFunction;
 import org.apache.flink.streaming.api.operators.async.AsyncWaitOperator;
+import org.apache.flink.streaming.api.operators.async.AsyncWaitOperatorForCache;
 
 import java.util.concurrent.TimeUnit;
 
@@ -85,6 +86,32 @@ public class AsyncDataStream {
 			mode);
 
 		return in.transform("async wait operator", outTypeInfo, operator);
+	}
+
+	private static <IN, OUT> SingleOutputStreamOperator<OUT> addOperatorWithCache(
+		DataStream<IN> in,
+		AsyncFunction<IN, OUT> func,
+		long timeout,
+		int bufSize,
+		OutputMode mode) {
+
+		TypeInformation<OUT> outTypeInfo = TypeExtractor.getUnaryOperatorReturnType(
+			func,
+			AsyncFunction.class,
+			0,
+			1,
+			new int[]{1, 0},
+			in.getType(),
+			Utils.getCallLocationName(),
+			true);
+
+		AsyncWaitOperatorForCache<IN, OUT> operator = new AsyncWaitOperatorForCache<>(
+			in.getExecutionEnvironment().clean(func),
+			timeout,
+			bufSize,
+			mode);
+
+		return in.transform("async wait operator with cache", outTypeInfo, operator);
 	}
 
 	/**
@@ -176,5 +203,19 @@ public class AsyncDataStream {
 			timeUnit.toMillis(timeout),
 			DEFAULT_QUEUE_CAPACITY,
 			OutputMode.ORDERED);
+	}
+
+	public static <IN, OUT> SingleOutputStreamOperator<OUT> unorderedWaitWithCache(
+			DataStream<IN> in,
+			AsyncFunction<IN, OUT> func,
+			long timeout,
+			TimeUnit timeUnit) {
+		return addOperatorWithCache(
+			in,
+			func,
+			timeUnit.toMillis(timeout),
+			DEFAULT_QUEUE_CAPACITY,
+			OutputMode.UNORDERED
+		);
 	}
 }
