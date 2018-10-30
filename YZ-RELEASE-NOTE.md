@@ -35,3 +35,5 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10321][network] Make the condition of broadcast partitioner simple (#6688)
     [FLINK-10223][LOG]Logging with resourceId during taskmanager startup (Merged in 1.6.1)
     [FLINK-9567][yarn] Before requesting new containers always check if it is required
+## yz-flink-1.0.3
+    [SJJCSS-360]Specify hadoop version to 2.6.5 when compile
