@@ -400,6 +400,7 @@ under the License.
 					kills due to container limits on travis -->
 					<forkCount>${flink.forkCountTestPackage}</forkCount>
 					<reuseForks>false</reuseForks>
+					<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
 					<environmentVariables>
 						<!-- Make sure external hadoop environment will not affect maven building -->
 						<HADOOP_HOME />

@@ -35,7 +35,7 @@ under the License.
 	<repositories>
 		<repository>
 			<id>confluent</id>
-			<url>http://packages.confluent.io/maven/</url>
+			<url>http://maven.qima-inc.com/content/repositories/thirdparty/</url>
 		</repository>
 	</repositories>
 

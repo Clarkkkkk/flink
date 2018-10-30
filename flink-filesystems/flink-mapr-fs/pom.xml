@@ -35,8 +35,8 @@ under the License.
 	<repositories>
 		<repository>
 			<id>mapr-releases</id>
-			<url>http://maven.qima-inc.com/</url>
-			<snapshots><enabled>false</enabled></snapshots>
+			<url>http://maven.qima-inc.com/content/repositories/thirdparty/</url>
+			<snapshots><enabled>true</enabled></snapshots>
 			<releases><enabled>true</enabled></releases>
 		</repository>
 	</repositories>
@@ -63,6 +63,63 @@ under the License.
 			<artifactId>maprfs</artifactId>
 			<version>5.2.1-mapr</version>
 			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-auth</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>apacheds-kerberos-codec</artifactId>
+					<groupId>org.apache.directory.server</groupId>
+				</exclusion>
+			</exclusions>
+			<version>${hadoop.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-common</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20080701</version>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.14</version>
+		</dependency>
+		<!--  test dependencies  -->
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-classworlds</artifactId>
+			<type>jar</type>
+			<scope>test</scope>
+			<version>2.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<type>jar</type>
+			<scope>test</scope>
+			<version>${junit.version}</version>
 		</dependency>
 
 	</dependencies>
