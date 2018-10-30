@@ -17,8 +17,8 @@
 # limitations under the License.
 ################################################################################
 
-OLD="1.6.1-yz-1.0.2-RELEASE"
-NEW="1.6.1-yz-1.0.3-RELEASE"
+OLD="1.6.1-yz-1.0.3-RELEASE"
+NEW="1.6.1-yz-1.0-SNAPSHOT"
 
 HERE=` basename "$PWD"`
 if [[ "$HERE" != "tools" ]]; then
