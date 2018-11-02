@@ -206,6 +206,21 @@ public class AsyncDataStream {
 	}
 
 	public static <IN, OUT> SingleOutputStreamOperator<OUT> unorderedWaitWithCache(
+		DataStream<IN> in,
+		AsyncFunction<IN, OUT> func,
+		long timeout,
+		TimeUnit timeUnit,
+		int capacity) {
+		return addOperatorWithCache(
+			in,
+			func,
+			timeUnit.toMillis(timeout),
+			capacity,
+			OutputMode.UNORDERED
+		);
+	}
+
+	public static <IN, OUT> SingleOutputStreamOperator<OUT> unorderedWaitWithCache(
 			DataStream<IN> in,
 			AsyncFunction<IN, OUT> func,
 			long timeout,
