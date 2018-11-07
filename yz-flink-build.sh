@@ -18,3 +18,5 @@
 ################################################################################
 
 mvn clean install -DskipTests -Dhadoop.version=2.6.5
+cd flink-dist
+mvn clean install -Dhadoop.version=2.6.5
