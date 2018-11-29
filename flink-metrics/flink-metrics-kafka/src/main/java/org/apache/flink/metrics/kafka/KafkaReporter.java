@@ -60,7 +60,8 @@ public class KafkaReporter extends AbstractReporter implements Scheduled {
 		String clientId = metricConfig.getString(CLIENT_ID_KEY, null);
 		this.topic = metricConfig.getString(TOPIC_KEY, null);
 		this.jobName = metricConfig.getString(JOBNAME_KEY, "default");
-		log.info("Kafka metric reporter with brokers: {}, clientId: {}, topic: {}.", brokerList, clientId, topic);
+		log.info("Kafka metric reporter with brokers: {}, clientId: {}, topic: {}, "
+			+ "jobName: {}.", brokerList, clientId, topic, jobName);
 		if (brokerList == null || clientId == null || topic == null) {
 			throw new IllegalArgumentException("Invalid borker/clientId/topic configuration.");
 		}
