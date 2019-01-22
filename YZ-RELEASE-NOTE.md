@@ -37,3 +37,6 @@ yz-flink is a company version based on Apache Flink
     [FLINK-9567][yarn] Before requesting new containers always check if it is required
 ## yz-flink-1.0.3
     [SJJCSS-360]Specify hadoop version to 2.6.5 when compile
+
+## yz-flink-1.0.4
+    [FLINK-10687] [table] Introduce flink-table-common
