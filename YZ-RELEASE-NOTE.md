@@ -40,3 +40,8 @@ yz-flink is a company version based on Apache Flink
 
 ## yz-flink-1.0.4
     [FLINK-10687] [table] Introduce flink-table-common
+    [FLINK-10687] [table] Introduce flink-table-common
+    [FLINK-9916] Add FROM_BASE64 function for table/sql API
+    [FLINK-9928] Add LOG2 function for table/sql API
+    [FLINK-9688] [table] Add ATAN2 SQL function support
+    [FLINK-10079] [table] Look up sink tables in external catalogs.
