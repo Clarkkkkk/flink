@@ -40,7 +40,6 @@ yz-flink is a company version based on Apache Flink
 
 ## yz-flink-1.0.4
     [FLINK-10687] [table] Introduce flink-table-common
-    [FLINK-10687] [table] Introduce flink-table-common
     [FLINK-9916] Add FROM_BASE64 function for table/sql API
     [FLINK-9928] Add LOG2 function for table/sql API
     [FLINK-9688] [table] Add ATAN2 SQL function support
@@ -55,3 +54,18 @@ yz-flink is a company version based on Apache Flink
     [hotfix][table] Simplify NonWindowJoin class Piotr Nowojski 2018/7/19, 10:55 PM
     [hotfix][table] Add convienient constructors for CRow Piotr Nowojski 2018/7/20, 6:14 PM
     [hotfix][table,tests] Add convienient verify methods to HarnessTestBase Piotr Nowojski 2018/7/20, 6:40 PM
+    [FLINK-9714][table] Support versioned joins with processing timePiotr Nowojski2018/9/20, 8:15 PM
+	[hotfix][docs,table] Split Streaming Concepts page into multiple documents. Piotr Nowojski* 2018/9/19, 9:20 PM
+	[FLINK-9712][docs,table] Document processing time Temporal Table JoinsPiotr Nowojski*2018/9/20, 3:43 PM
+	[FLINK-10156][table] Deprecate Table.writeToSink().Fabian Hueske2018/10/8, 7:41 PM
+	[FLINK-9915] [table] Add TO_BASE64 function for table/sql APIyanghua*2018/7/23, 5:52 PM
+	[FLINK-9853] [table] Add HEX support for Table API & SQL xueyu* 2018/7/15, 8:01 PM
+	[FLINK-7205] [table] Add UUID() for Table API & SQLwind*2018/8/1, 12:52 PM
+	[FLINK-9977] [table] [docs] Refine the SQL/Table built-in function docs. Xingcan Cui* 2018/7/28, 11:55 PM
+	[FLINK-10059] [table] Add LTRIM function in Table API and SQL yanghua* 2018/8/5, 5:09 PM
+	[FLINK-10060] [table] Add RTRIM function in Table API and SQL yanghua* 2018/8/7, 5:17 PM
+	[FLINK-10136] [table] Add REPEAT function in Table API and SQL yanghua* 2018/8/21, 8:35 PM
+	[FLINK-10174] [table] Define UTF-8 charset for HEX, TO_BASE64, FROM_BASE64xueyu*2018/8/20, 3:16 PM
+	[FLINK-9991] [table] Add regexp_replace function to TableAPI and SQL yanghua* 2018/7/29, 9:36 PM
+	[FLINK-6846] [table] Add timestamp addition in Table API xueyu*2018/6/20, 9:30 PM
+	[FLINK-6847] [FLINK-6813] [table] Add support for TIMESTAMPDIFF in Table API & SQLxueyu*2018/7/8, 6:50 PM
