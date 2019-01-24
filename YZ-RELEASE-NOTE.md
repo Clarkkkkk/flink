@@ -69,3 +69,27 @@ yz-flink is a company version based on Apache Flink
 	[FLINK-9991] [table] Add regexp_replace function to TableAPI and SQL yanghua* 2018/7/29, 9:36 PM
 	[FLINK-6846] [table] Add timestamp addition in Table API xueyu*2018/6/20, 9:30 PM
 	[FLINK-6847] [FLINK-6813] [table] Add support for TIMESTAMPDIFF in Table API & SQLxueyu*2018/7/8, 6:50 PM
+    [FLINK-9642][cep] Added caching layer to SharedBuffer(#6205) Aitozi* 2018/8/29, 11:08 PM
+    [FLINK-10417][cep] Added option to throw exception on pattern variable miss during SKIP_TO_FIRST/LAST Dawid Wysakowicz* 2018/10/1, 3:46 PM
+    [FLINK-10414][cep] Added skip to next strategy Dawid Wysakowicz* 2018/10/1, 5:40 PM
+    [FLINK-10163] [sql-client] Support views in SQL Client Timo Walther* 2018/8/23, 1:03 PM
+    [FLINK-10281] [table] Fix string literal escaping throughout Table & SQL API Timo Walther* 2018/9/7, 7:32 PM
+    [FLINK-10474][table] Evaluate IN/NOT_IN with literals as local predicate. hequn8128* 2018/10/4, 5:26 PM
+    [FLINK-7062][table][cep] Initial support for the basic functionality of MATCH_RECOGNIZE Dian Fu* 2017/8/8, 7:10 PM
+    [hotfix] [table] [docs] Improvements for the functions documentation Timo Walther* 2018/8/14, 5:39 PM
+    [FLINK-10187] [table] Fix LogicalUnnestRule after upgrading to Calcite 1.17. Shuyi Chen* 2018/8/21, 2:30 PM
+    [FLINK-10201] [table] [test] The batchTestUtil was mistakenly used in some stream sql tests Xingcan Cui* 2018/8/23, 10:16 AM
+    [FLINK-10222] [table] Fix parsing of keywords. yanghua* 2018/8/28, 5:31 PM
+    [FLINK-10259] [table] Fix identification of key attributes for GroupWindows. Fabian Hueske* 2018/8/30, 9:39 PM
+    [FLINK-10145] [table] Add replace function in Table API and SQL Guibo Pan* 2018/8/19, 1:09 AM
+    [FLINK-10451] [table] TableFunctionCollector should handle the life cycle of ScalarFunction Xpray* 2018/9/28, 4:34 PM
+    [FLINK-9990] [table] Add regex_extract function in TableAPI and SQL yanghua* 2018/7/29, 11:27 AM
+    [FLINK-10528][table] Remove methods that were deprecated in Flink 1.4.0. Fabian Hueske* 2018/10/11, 8:06 PM
+    [hotfix][table] Rewrite TemporalJoin from CoProcessFunction to TwoInputStreamOperator Piotr Nowojski* 2018/9/13, 7:03 PM
+    [FLINK-9715][table] Support temporal join with event time Piotr Nowojski* 2018/9/7, 5:24 PM
+    [hotfix][table] Allowed using '|' and stripMargin with indenter Dawid Wysakowicz* 2018/10/18, 9:10 PM
+    [hotfix][cep] Throw exception when skipping to first element of a match Dawid Wysakowicz* 2018/10/9, 4:47 PM
+    [hotfix][cep] Changed cep operator names to distinguish between global and keyed Dawid Wysakowicz* 2018/10/9, 4:48 PM
+    [FLINK-10470] Add method to check if pattern can produce empty matches Dawid Wysakowicz* 2018/10/5, 9:24 PM
+    [hotfix][cep] Added equals/hashcode to Pattern/SkipStrategies/Quantifier Dawid Wysakowicz* 2018/10/9, 4:49 PM
+    [FLINK-7062][table][cep] Improved support of basic functionality of MATCH RECOGNIZE Dawid Wysakowicz* 2018/10/19, 10:36 PM
