@@ -93,3 +93,5 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10470] Add method to check if pattern can produce empty matches Dawid Wysakowicz* 2018/10/5, 9:24 PM
     [hotfix][cep] Added equals/hashcode to Pattern/SkipStrategies/Quantifier Dawid Wysakowicz* 2018/10/9, 4:49 PM
     [FLINK-7062][table][cep] Improved support of basic functionality of MATCH RECOGNIZE Dawid Wysakowicz* 2018/10/19, 10:36 PM
+    [FLINK-10263] [sql-client] Fix classloader issues in SQL Client Timo Walther* 2018/9/20, 4:28 PM
+    [FLINK-3875] [connectors] Add an upsert table sink factory for Elasticsearch Timo Walther* 2018/8/15, 7:51 PM
