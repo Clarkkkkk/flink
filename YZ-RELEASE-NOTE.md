@@ -95,3 +95,4 @@ yz-flink is a company version based on Apache Flink
     [FLINK-7062][table][cep] Improved support of basic functionality of MATCH RECOGNIZE Dawid Wysakowicz* 2018/10/19, 10:36 PM
     [FLINK-10263] [sql-client] Fix classloader issues in SQL Client Timo Walther* 2018/9/20, 4:28 PM
     [FLINK-3875] [connectors] Add an upsert table sink factory for Elasticsearch Timo Walther* 2018/8/15, 7:51 PM
+    [FLINK-10687] [table] Move TableException and ValidationException to flink-table-common Timo Walther 2018/10/26, 7:35 PM
