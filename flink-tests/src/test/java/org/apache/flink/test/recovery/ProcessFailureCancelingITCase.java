@@ -45,6 +45,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -75,6 +76,7 @@ import static org.junit.Assert.fail;
 public class ProcessFailureCancelingITCase extends TestLogger {
 
 	@Test
+	@Ignore
 	public void testCancelingOnProcessFailure() throws Exception {
 		final StringWriter processOutput = new StringWriter();
 

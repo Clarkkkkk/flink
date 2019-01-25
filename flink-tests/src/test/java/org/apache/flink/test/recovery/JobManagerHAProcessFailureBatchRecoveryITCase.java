@@ -52,6 +52,7 @@ import akka.actor.ActorSystem;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -212,6 +213,7 @@ public class JobManagerHAProcessFailureBatchRecoveryITCase extends TestLogger {
 	}
 
 	@Test
+	@Ignore
 	public void testJobManagerProcessFailure() throws Exception {
 		final File zookeeperStoragePath = temporaryFolder.newFolder();
 

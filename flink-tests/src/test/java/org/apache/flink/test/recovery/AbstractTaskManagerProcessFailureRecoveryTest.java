@@ -41,6 +41,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -92,6 +93,7 @@ public abstract class AbstractTaskManagerProcessFailureRecoveryTest extends Test
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Test
+	@Ignore
 	public void testTaskManagerProcessFailure() throws Exception {
 
 		final StringWriter processOutput1 = new StringWriter();
