@@ -98,3 +98,7 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10687] [table] Move TableException and ValidationException to flink-table-common Timo Walther 2018/10/26, 7:35 PM
     [FLINK-8865] [sql-client] Add CLI query code completion in SQL Client xueyu* 2018/10/4, 12:34 PM
     [FLINK-8865] [sql-client] Finalize CLI query code completion in SQL Client Timo Walther* 2018/10/13, 2:58 AM
+    [hotfix][table,test] Deduplicate code in ExpressionTestBase Piotr Nowojski 2018/8/29, 4:51 PM
+    [hotfix][table,test] Improve error message in ExpressionTestBase Piotr Nowojski 2018/8/30, 7:36 PM
+    [FLINK-10398] Add Tanh math function supported in Table API and SQL yanghua* 2018/9/23, 12:47 PM
+    [FLINK-10384] Add Sinh math function supported in Table API and SQL yanghua* 2018/9/21, 2:47 PM
