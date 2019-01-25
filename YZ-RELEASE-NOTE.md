@@ -96,3 +96,5 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10263] [sql-client] Fix classloader issues in SQL Client Timo Walther* 2018/9/20, 4:28 PM
     [FLINK-3875] [connectors] Add an upsert table sink factory for Elasticsearch Timo Walther* 2018/8/15, 7:51 PM
     [FLINK-10687] [table] Move TableException and ValidationException to flink-table-common Timo Walther 2018/10/26, 7:35 PM
+    [FLINK-8865] [sql-client] Add CLI query code completion in SQL Client xueyu* 2018/10/4, 12:34 PM
+    [FLINK-8865] [sql-client] Finalize CLI query code completion in SQL Client Timo Walther* 2018/10/13, 2:58 AM
