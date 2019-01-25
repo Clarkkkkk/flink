@@ -117,3 +117,5 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10397] Remove CoreOptions#MODE Till Rohrmann* 2018/9/23, 5:16 AM
     [FLINK-10637] Use MiniClusterResource for tests in flink-runtime Till Rohrmann* 2018/10/22, 10:00 PM
     Revert CoreOptions Shimin Yang 2019/1/25, 5:10 PM
+    [FLINK-10675][sql-client][table] Fixed depdency issues in cep & table/sql-client integration Dawid Wysakowicz* 2018/10/25, 4:07 PM
+    [hotfix][table] Added default branches to pattern matching to supress warnings Dawid Wysakowicz* 2018/10/29, 4:18 PM
