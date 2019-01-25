@@ -105,3 +105,15 @@ yz-flink is a company version based on Apache Flink
     [FLINK-9737] [table] Add more auxiliary methods for descriptor properties Timo Walther* 2018/10/23, 3:48 PM
     [FLINK-9737] [table] Make function validation optional Timo Walther* 2018/10/22, 7:48 PM
     [FLINK-9737] [FLINK-8880] [sql-client] Support defining temporal tables in environment files Timo Walther* 2018/10/22, 7:51 PM
+    [FLINK-10396] Remove CodebaseType Till Rohrmann* 2018/9/23, 1:54 AM
+    [FLINK-10400] Fail JobResult if application finished in CANCELED or FAILED state Till Rohrmann* 2018/9/24, 3:09 AM
+    [FLINK-10508] Port "The JobManager actor must handle jobs when not enough slots" to MiniClusterITCase#testHandleJobsWhenNotEnoughSlot 陈梓立* 2018/10/12, 1:22 PM
+    [hotfix] a bit refactor of MiniClusterITCase 陈梓立* 2018/10/12, 1:27 PM
+    [FLINK-10508] Port scheduling test 陈梓立* 2018/10/12, 1:44 PM
+    [FLINK-10508] Port Savepoint relevant tests 陈梓立* 2018/10/13, 3:06 AM
+    [FLINK-10508] Remove JobManagerITCase Till Rohrmann* 2018/10/18, 9:13 PM
+    [FLINK-9900][tests] Include more information on timeout in Zookeeper HA ITCase Chesnay Schepler* 2018/8/20, 11:40 PM
+    [FLINK-9900][tests] Include more information on timeout in Zookeeper HA ITCase Chesnay Schepler* 2018/8/20, 11:40 PM
+    [FLINK-10397] Remove CoreOptions#MODE Till Rohrmann* 2018/9/23, 5:16 AM
+    [FLINK-10637] Use MiniClusterResource for tests in flink-runtime Till Rohrmann* 2018/10/22, 10:00 PM
+    Revert CoreOptions Shimin Yang 2019/1/25, 5:10 PM
