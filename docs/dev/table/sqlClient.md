@@ -108,6 +108,8 @@ Greg, 1
 
 Both result modes can be useful during the prototyping of SQL queries. In both modes, results are stored in the Java heap memory of the SQL Client. In order to keep the CLI interface responsive, the changelog mode only shows the latest 1000 changes. The table mode allows for navigating through bigger results that are only limited by the available main memory and the configured [maximum number of rows](sqlClient.html#configuration) (`max-table-result-rows`).
 
+<span class="label label-danger">Attention</span> Queries that are executed in a batch environment, can only be retrieved using the `table` result mode.
+
 After a query is defined, it can be submitted to the cluster as a long-running, detached Flink job. For this, a target system that stores the results needs to be specified using the [INSERT INTO statement](sqlClient.html#detached-sql-queries). The [configuration section](sqlClient.html#configuration) explains how to declare table sources for reading data, how to declare table sinks for writing data, and how to configure other table program properties.
 
 {% top %}
@@ -207,13 +209,14 @@ execution:
   result-mode: table                # required: either 'table' or 'changelog'
   max-table-result-rows: 1000000    # optional: maximum number of maintained rows in
                                     #   'table' mode (1000000 by default, smaller 1 means unlimited)
-                                    #   (from Flink 1.6.1)
   time-characteristic: event-time   # optional: 'processing-time' or 'event-time' (default)
   parallelism: 1                    # optional: Flink's parallelism (1 by default)
   periodic-watermarks-interval: 200 # optional: interval for periodic watermarks (200 ms by default)
   max-parallelism: 16               # optional: Flink's maximum parallelism (128 by default)
   min-idle-state-retention: 0       # optional: table program's minimum idle state time
   max-idle-state-retention: 0       # optional: table program's maximum idle state time
+  restart-strategy:                 # optional: restart strategy
+    type: fallback                  #   "fallback" to global restart strategy by default
 
 # Deployment properties allow for describing the cluster to which table programs are submitted to.
 
@@ -238,7 +241,35 @@ Depending on the use case, a configuration can be split into multiple files. The
 CLI commands > session environment file > defaults environment file
 {% endhighlight %}
 
-Queries that are executed in a batch environment, can only be retrieved using the `table` result mode. 
+#### Restart Strategies
+
+Restart strategies control how Flink jobs are restarted in case of a failure. Similar to [global restart strategies]({{ site.baseurl }}/dev/restart_strategies.html) for a Flink cluster, a more fine-grained restart configuration can be declared in an environment file.
+
+The following strategies are supported:
+
+{% highlight yaml %}
+execution:
+  # falls back to the global strategy defined in flink-conf.yaml
+  restart-strategy:
+    type: fallback
+
+  # job fails directly and no restart is attempted
+  restart-strategy:
+    type: none
+
+  # attempts a given number of times to restart the job
+  restart-strategy:
+    type: fixed-delay
+    attempts: 3      # retries before job is declared as failed (default: Integer.MAX_VALUE)
+    delay: 10000     # delay in ms between retries (default: 10 s)
+
+  # attempts as long as the maximum number of failures per time interval is not exceeded
+  restart-strategy:
+    type: failure-rate
+    max-failures-per-interval: 1   # retries in interval until failing (default: 1)
+    failure-rate-interval: 60000   # measuring interval in ms for failure rate
+    delay: 10000                   # delay in ms between retries (default: 10 s)
+{% endhighlight %}
 
 {% top %}
 
