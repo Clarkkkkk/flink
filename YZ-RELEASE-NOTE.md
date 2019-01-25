@@ -102,3 +102,6 @@ yz-flink is a company version based on Apache Flink
     [hotfix][table,test] Improve error message in ExpressionTestBase Piotr Nowojski 2018/8/30, 7:36 PM
     [FLINK-10398] Add Tanh math function supported in Table API and SQL yanghua* 2018/9/23, 12:47 PM
     [FLINK-10384] Add Sinh math function supported in Table API and SQL yanghua* 2018/9/21, 2:47 PM
+    [FLINK-9737] [table] Add more auxiliary methods for descriptor properties Timo Walther* 2018/10/23, 3:48 PM
+    [FLINK-9737] [table] Make function validation optional Timo Walther* 2018/10/22, 7:48 PM
+    [FLINK-9737] [FLINK-8880] [sql-client] Support defining temporal tables in environment files Timo Walther* 2018/10/22, 7:51 PM
