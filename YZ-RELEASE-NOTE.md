@@ -122,3 +122,6 @@ yz-flink is a company version based on Apache Flink
     [FLINK-6670][tests] Remove CommonTestUtils#createTempDirectory Chesnay Schepler* 2018/8/20, 11:37 PM
     [FLINK-10687] [table] Move TableSchema to flink-table-common Timo Walther* 2018/10/26, 7:34 PM
     [FLINK-10687] [table] Move TypeStringUtils to flink-table-common Timo Walther* 2018/10/26, 9:57 PM
+    [FLINK-10687] [table] Move DescriptorProperties to flink-table-common Timo Walther* 2018/10/29, 4:18 PM
+    [FLINK-10687] [table] Move format factories to flink-table-common Timo Walther* 2018/10/27, 1:45 PM
+    [FLINK-10687] [table] Move format descriptors and validators to flink-table-common Timo Walther* 2018/10/27, 9:47 PM
