@@ -63,6 +63,7 @@ import static org.junit.Assert.assertEquals;
  * migrating for multiple previous Flink versions, as well as for different state backends.
  */
 @RunWith(Parameterized.class)
+@Ignore
 public class LegacyStatefulJobSavepointMigrationITCase extends SavepointMigrationTestBase {
 
 	private static final int NUM_SOURCE_ELEMENTS = 4;
