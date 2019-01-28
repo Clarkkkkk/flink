@@ -126,3 +126,15 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10687] [table] Move format factories to flink-table-common Timo Walther* 2018/10/27, 1:45 PM
     [FLINK-10687] [table] Move format descriptors and validators to flink-table-common Timo Walther* 2018/10/27, 9:47 PM
     [FLINK-10245] [Streaming Connector] Add Pojo, Tuple, Row and Scala Product DataStream Sink and Upsert Table Sink for HBase Shimin Yang 2018/8/28, 6:25 PM
+    [hotfix] Fix checkstyle violations in SlotManager Till Rohrmann* 2018/9/18, 5:18 PM
+    [hotfix] Fix checkstyle violations in SlotManager Till Rohrmann* 2018/9/18, 5:18 PM
+    [FLINK-10260] Clean up log messages for TaskExecutor registrations Andrey Zagrebin* 2018/9/20, 8:57 PM
+    [FLINK-9890][Distributed Coordination] Remove obsolete class ResourceManagerConfiguration gyao* 2018/7/18, 10:23 PM
+    [FLINK-9455][RM] Add support for multi task slot TaskExecutors Till Rohrmann* 2018/8/22, 7:51 PM
+    [hotfix] Cancel actual pending slot request in SlotManager#updateSlotState Till Rohrmann* 2018/9/21, 9:53 PM
+    [hotfix] Remove mocking from SlotManagerTest Till Rohrmann* 2018/9/21, 11:16 PM
+    [hotfix] Remove mocking from SlotProtocolTest Till Rohrmann* 2018/9/21, 11:24 PM
+    [hotfix] Start MesosWorkers with default ContaineredTaskManagerConfiguration Till Rohrmann* 2018/9/22, 8:13 PM
+    [FLINK-10099][test] Improve YarnResourceManagerTest 陈梓立* 2018/8/6, 4:09 PM
+    [FLINK-10208][build] Bump mockito to 2.21.0 / powermock to 2.0.0-beta.5 Chesnay Schepler* 2018/10/8, 7:39 PM
+    [FLINK-10848] Remove container requests after successful container allocation Till Rohrmann* 2019/1/8, 8:06 PM
