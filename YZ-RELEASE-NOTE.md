@@ -121,3 +121,4 @@ yz-flink is a company version based on Apache Flink
     [hotfix][table] Added default branches to pattern matching to supress warnings Dawid Wysakowicz* 2018/10/29, 4:18 PM
     [FLINK-6670][tests] Remove CommonTestUtils#createTempDirectory Chesnay Schepler* 2018/8/20, 11:37 PM
     [FLINK-10687] [table] Move TableSchema to flink-table-common Timo Walther* 2018/10/26, 7:34 PM
+    [FLINK-10687] [table] Move TypeStringUtils to flink-table-common Timo Walther* 2018/10/26, 9:57 PM
