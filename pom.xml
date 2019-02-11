@@ -119,6 +119,9 @@ under the License.
 		<java.version>1.8</java.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<log4j.version>1.2.17</log4j.version>
+		<logback.version>1.1.2</logback.version>
+		<log4j-over-slf4j.version>1.7.7</log4j-over-slf4j.version>
+		<track-appender.version>2.5.8-RELEASE</track-appender.version>
 		<!-- Overwrite default values from parent pom.
 			 Intellij is (sometimes?) using those values to choose target language level
 			 and thus is changing back to java 1.6 on each maven re-import -->

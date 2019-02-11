@@ -38,8 +38,13 @@ under the License.
 			<useTransitiveFiltering>true</useTransitiveFiltering>
 
 			<includes>
-				<include>org.slf4j:slf4j-log4j12</include>
-				<include>log4j:log4j</include>
+				<!--<include>org.slf4j:slf4j-log4j12</include>-->
+				<!--<include>log4j:log4j</include>-->
+				<include>ch.qos.logback:logback-classic</include>
+				<include>ch.qos.logback:logback-core</include>
+				<include>ch.qos.logback:logback-access</include>
+				<include>org.slf4j:log4j-over-slf4j</include>
+				<include>com.youzan.platform:track-appender</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>
@@ -85,9 +90,9 @@ under the License.
 
 		<!-- copy Kafka metrics reporter jar -->
 		<file>
-			<source>../flink-metrics/flink-metrics-kafka/target/flink-metrics-kafka-${project.version}-jar-with-dependencies.jar</source>
+			<source>../flink-metrics/flink-metrics-kafka/target/flink-metrics-kafka-${project.version}.jar</source>
 			<outputDirectory>lib/</outputDirectory>
-			<destName>flink-metrics-slf4j-${project.version}.jar</destName>
+			<destName>flink-metrics-kafka-${project.version}.jar</destName>
 			<fileMode>0644</fileMode>
 		</file>
 
