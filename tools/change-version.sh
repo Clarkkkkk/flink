@@ -17,7 +17,7 @@
 # limitations under the License.
 ################################################################################
 
-OLD="1.6.1-yz-1.0.3-RELEASE"
+OLD="1.6.1-yz-1.0-SNAPSHOT"
 NEW="1.6.1-yz-1.0-SNAPSHOT"
 
 HERE=` basename "$PWD"`
