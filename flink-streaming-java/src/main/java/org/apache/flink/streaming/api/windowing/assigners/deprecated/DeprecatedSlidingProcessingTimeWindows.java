@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-package org.apache.flink.streaming.api.windowing.assigners;
+package org.apache.flink.streaming.api.windowing.assigners.deprecated;
 
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.triggers.ProcessingTimeTrigger;
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.streaming.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +43,7 @@ import java.util.List;
  *   keyed.window(SlidingProcessingTimeWindows.of(Time.of(1, MINUTES), Time.of(10, SECONDS));
  * } </pre>
  */
-public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, TimeWindow> {
+public class DeprecatedSlidingProcessingTimeWindows extends WindowAssigner<Object, TimeWindow> {
 	private static final long serialVersionUID = 1L;
 
 	private final long size;
@@ -52,9 +52,7 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 
 	private final long slide;
 
-	private final long greatestCommonDivisor;
-
-	private SlidingProcessingTimeWindows(long size, long slide, long offset) {
+	private DeprecatedSlidingProcessingTimeWindows(long size, long slide, long offset) {
 		if (offset < 0 || offset >= slide || size <= 0) {
 			throw new IllegalArgumentException("SlidingProcessingTimeWindows parameters must satisfy 0 <= offset < slide and size > 0");
 		}
@@ -62,19 +60,12 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 		this.size = size;
 		this.slide = slide;
 		this.offset = offset;
-		this.greatestCommonDivisor = MathUtils.greatestCommonDivisor(size, slide);
 	}
 
 	@Override
 	public Collection<TimeWindow> assignWindows(Object element, long timestamp, WindowAssignerContext context) {
 		timestamp = context.getCurrentProcessingTime();
 		List<TimeWindow> windows = new ArrayList<>((int) (size / slide));
-
-		// Get the base window and add it at the first of collection of windows
-		long baseWindowStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, greatestCommonDivisor);
-		TimeWindow baseWindow = new TimeWindow(baseWindowStart, baseWindowStart + greatestCommonDivisor);
-		windows.add(baseWindow);
-
 		long lastStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, slide);
 		for (long start = lastStart;
 			start > timestamp - size;
@@ -110,8 +101,8 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 	 * @param slide The slide interval of the generated windows.
 	 * @return The time policy.
 	 */
-	public static SlidingProcessingTimeWindows of(Time size, Time slide) {
-		return new SlidingProcessingTimeWindows(size.toMilliseconds(), slide.toMilliseconds(), 0);
+	public static DeprecatedSlidingProcessingTimeWindows of(Time size, Time slide) {
+		return new DeprecatedSlidingProcessingTimeWindows(size.toMilliseconds(), slide.toMilliseconds(), 0);
 	}
 
 	/**
@@ -132,8 +123,8 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 	 * @param offset The offset which window start would be shifted by.
 	 * @return The time policy.
 	 */
-	public static SlidingProcessingTimeWindows of(Time size, Time slide, Time offset) {
-		return new SlidingProcessingTimeWindows(size.toMilliseconds(), slide.toMilliseconds(),
+	public static DeprecatedSlidingProcessingTimeWindows of(Time size, Time slide, Time offset) {
+		return new DeprecatedSlidingProcessingTimeWindows(size.toMilliseconds(), slide.toMilliseconds(),
 			offset.toMilliseconds() % slide.toMilliseconds());
 	}
 

@@ -59,7 +59,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(-3000, 2000),
 				timeWindow(-2000, 3000),
 				timeWindow(-1000, 4000),
-				timeWindow(0, 5000)));
+				timeWindow(0, 5000),
+				timeWindow(0, 1000)));
 
 		when(mockContext.getCurrentProcessingTime()).thenReturn(4999L);
 		assertThat(assigner.assignWindows("String", Long.MIN_VALUE, mockContext), containsInAnyOrder(
@@ -67,7 +68,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(1000, 6000),
 				timeWindow(2000, 7000),
 				timeWindow(3000, 8000),
-				timeWindow(4000, 9000)));
+				timeWindow(4000, 9000),
+				timeWindow(4000, 5000)));
 
 		when(mockContext.getCurrentProcessingTime()).thenReturn(5000L);
 		assertThat(assigner.assignWindows("String", Long.MIN_VALUE, mockContext), containsInAnyOrder(
@@ -75,7 +77,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(2000, 7000),
 				timeWindow(3000, 8000),
 				timeWindow(4000, 9000),
-				timeWindow(5000, 10000)));
+				timeWindow(5000, 10000),
+				timeWindow(5000, 6000)));
 	}
 
 	@Test
@@ -92,7 +95,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(-2900, 2100),
 				timeWindow(-1900, 3100),
 				timeWindow(-900, 4100),
-				timeWindow(100, 5100)));
+				timeWindow(100, 5100),
+				timeWindow(100, 1100)));
 
 		when(mockContext.getCurrentProcessingTime()).thenReturn(5099L);
 		assertThat(assigner.assignWindows("String", Long.MIN_VALUE, mockContext), containsInAnyOrder(
@@ -100,7 +104,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(1100, 6100),
 				timeWindow(2100, 7100),
 				timeWindow(3100, 8100),
-				timeWindow(4100, 9100)));
+				timeWindow(4100, 9100),
+				timeWindow(4100, 5100)));
 
 		when(mockContext.getCurrentProcessingTime()).thenReturn(5100L);
 		assertThat(assigner.assignWindows("String", Long.MIN_VALUE, mockContext), containsInAnyOrder(
@@ -108,7 +113,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(2100, 7100),
 				timeWindow(3100, 8100),
 				timeWindow(4100, 9100),
-				timeWindow(5100, 10100)));
+				timeWindow(5100, 10100),
+				timeWindow(5100, 6100)));
 	}
 
 	@Test
@@ -126,7 +132,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(-3500, 1500),
 				timeWindow(-2500, 2500),
 				timeWindow(-1500, 3500),
-				timeWindow(-500, 4500)));
+				timeWindow(-500, 4500),
+				timeWindow(-500, 500)));
 
 		when(mockContext.getCurrentProcessingTime()).thenReturn(5499L);
 		assertThat(assigner.assignWindows("String", Long.MIN_VALUE, mockContext), containsInAnyOrder(
@@ -134,7 +141,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(1500, 6500),
 				timeWindow(2500, 7500),
 				timeWindow(3500, 8500),
-				timeWindow(4500, 9500)));
+				timeWindow(4500, 9500),
+				timeWindow(4500, 5500)));
 
 		when(mockContext.getCurrentProcessingTime()).thenReturn(5100L);
 		assertThat(assigner.assignWindows("String", Long.MIN_VALUE, mockContext), containsInAnyOrder(
@@ -142,7 +150,8 @@ public class SlidingProcessingTimeWindowsTest extends TestLogger {
 				timeWindow(1500, 6500),
 				timeWindow(2500, 7500),
 				timeWindow(3500, 8500),
-				timeWindow(4500, 9500)));
+				timeWindow(4500, 9500),
+				timeWindow(4500, 5500)));
 	}
 
 	@Test

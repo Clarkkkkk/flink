@@ -26,6 +26,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.triggers.EventTimeTrigger;
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,7 +45,7 @@ import java.util.List;
  * } </pre>
  */
 @PublicEvolving
-public class SlidingEventTimeWindows extends WindowAssigner<Object, TimeWindow> {
+public class SlidingEventTimeWindows extends SlidingWindowAssigner<Object, TimeWindow> {
 	private static final long serialVersionUID = 1L;
 
 	private final long size;
@@ -52,6 +53,8 @@ public class SlidingEventTimeWindows extends WindowAssigner<Object, TimeWindow> 
 	private final long slide;
 
 	private final long offset;
+
+	private final long greatestCommonDivisor;
 
 	protected SlidingEventTimeWindows(long size, long slide, long offset) {
 		if (offset < 0 || offset >= slide || size <= 0) {
@@ -61,12 +64,19 @@ public class SlidingEventTimeWindows extends WindowAssigner<Object, TimeWindow> 
 		this.size = size;
 		this.slide = slide;
 		this.offset = offset;
+		this.greatestCommonDivisor = MathUtils.greatestCommonDivisor(size, slide);
 	}
 
 	@Override
 	public Collection<TimeWindow> assignWindows(Object element, long timestamp, WindowAssignerContext context) {
 		if (timestamp > Long.MIN_VALUE) {
 			List<TimeWindow> windows = new ArrayList<>((int) (size / slide));
+
+			// Get the base window and add it at the first of collection of windows
+			long baseWindowStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, greatestCommonDivisor);
+			TimeWindow baseWindow = new TimeWindow(baseWindowStart, baseWindowStart + greatestCommonDivisor);
+			windows.add(baseWindow);
+
 			long lastStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, slide);
 			for (long start = lastStart;
 				start > timestamp - size;

@@ -18,6 +18,7 @@
 
 package org.apache.flink.streaming.runtime.operators.windowing;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.api.common.ExecutionConfig;
@@ -40,6 +41,8 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
+import org.apache.flink.api.common.typeutils.base.IntSerializer;
+import org.apache.flink.api.common.typeutils.base.StringSerializer;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -52,7 +55,9 @@ import org.apache.flink.runtime.state.VoidNamespace;
 import org.apache.flink.runtime.state.VoidNamespaceSerializer;
 import org.apache.flink.runtime.state.internal.InternalAppendingState;
 import org.apache.flink.runtime.state.internal.InternalListState;
+import org.apache.flink.runtime.state.internal.InternalMapState;
 import org.apache.flink.runtime.state.internal.InternalMergingState;
+import org.apache.flink.runtime.state.internal.InternalValueState;
 import org.apache.flink.streaming.api.operators.AbstractUdfStreamOperator;
 import org.apache.flink.streaming.api.operators.ChainingStrategy;
 import org.apache.flink.streaming.api.operators.InternalTimer;
@@ -62,6 +67,7 @@ import org.apache.flink.streaming.api.operators.TimestampedCollector;
 import org.apache.flink.streaming.api.operators.Triggerable;
 import org.apache.flink.streaming.api.windowing.assigners.BaseAlignedWindowAssigner;
 import org.apache.flink.streaming.api.windowing.assigners.MergingWindowAssigner;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingWindowAssigner;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
@@ -72,6 +78,9 @@ import org.apache.flink.util.OutputTag;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -115,6 +124,10 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 
 	private final StateDescriptor<? extends AppendingState<IN, ACC>, ?> windowStateDescriptor;
 
+	private final MapStateDescriptor<W, String> windowStateReferenceDescriptor;
+
+	private final ValueStateDescriptor<Integer> baseWindowReferenceCountDescriptor;
+
 	/** For serializing the key in checkpoints. */
 	protected final TypeSerializer<K> keySerializer;
 
@@ -148,6 +161,10 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 
 	/** The state in which the window contents is stored. Each window is a namespace */
 	private transient InternalAppendingState<K, W, IN, ACC, ACC> windowState;
+
+	private transient InternalMapState<K, W, W, String> windowStateReference;
+
+	private transient InternalValueState<K, W, Integer> baseWindowReferenceCount;
 
 	/**
 	 * The {@link #windowState}, typed to merging state for merging windows.
@@ -207,6 +224,8 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 		this.keySelector = checkNotNull(keySelector);
 		this.keySerializer = checkNotNull(keySerializer);
 		this.windowStateDescriptor = windowStateDescriptor;
+		this.windowStateReferenceDescriptor = new MapStateDescriptor<>("TestWindowRefMapState", windowSerializer, new StringSerializer());
+		this.baseWindowReferenceCountDescriptor = new ValueStateDescriptor<>("TestBaseWindowRefValueState", new IntSerializer());
 		this.trigger = checkNotNull(trigger);
 		this.allowedLateness = allowedLateness;
 		this.lateDataOutputTag = lateDataOutputTag;
@@ -238,6 +257,14 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 		// NOTE - the state may be null in the case of the overriding evicting window operator
 		if (windowStateDescriptor != null) {
 			windowState = (InternalAppendingState<K, W, IN, ACC, ACC>) getOrCreateKeyedState(windowSerializer, windowStateDescriptor);
+		}
+
+		if (windowStateReferenceDescriptor != null) {
+			windowStateReference = (InternalMapState<K, W, W, String>) getOrCreateKeyedState(windowSerializer, windowStateReferenceDescriptor);
+		}
+
+		if (baseWindowReferenceCountDescriptor != null) {
+			baseWindowReferenceCount = (InternalValueState<K, W, Integer>) getOrCreateKeyedState(windowSerializer, baseWindowReferenceCountDescriptor);
 		}
 
 		// create the typed and helper states for merging windows
@@ -378,6 +405,44 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 
 			// need to make sure to update the merging state in state
 			mergingWindows.persist();
+		} else if (windowAssigner instanceof SlidingWindowAssigner) {
+			SlidingWindowAssigner slidingWindowAssigner = (SlidingWindowAssigner) this.windowAssigner;
+			W baseWindow = null;
+			boolean isFirst = true;
+			for (W window: elementWindows) {
+				if (isFirst) {
+					baseWindow = window;
+					isFirst = false;
+					windowState.setCurrentNamespace(baseWindow);
+					windowState.add(element.getValue());
+				} else {
+					// drop if the window is already late
+					if (isWindowLate(window)) {
+						continue;
+					}
+					isSkippedElement = false;
+
+					windowStateReference.setCurrentNamespace(window);
+					if (!windowStateReference.contains(baseWindow)) {
+						windowStateReference.put(baseWindow, "");
+						baseWindowReferenceCount.setCurrentNamespace(baseWindow);
+						Integer referenceCount = baseWindowReferenceCount.value();
+						if (referenceCount == null) {
+							referenceCount = 0;
+						}
+						baseWindowReferenceCount.update(referenceCount + 1);
+					}
+
+					triggerContext.key = key;
+					triggerContext.window = window;
+
+					TriggerResult triggerResult = triggerContext.onElement(element);
+
+					processSlidingWindowTriggerResult(triggerResult, window);
+
+					registerCleanupTimer(window);
+				}
+			}
 		} else {
 			for (W window: elementWindows) {
 
@@ -423,49 +488,110 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 		}
 	}
 
+	private void processSlidingWindowTriggerResult(TriggerResult triggerResult, W window) throws Exception {
+		if (triggerResult.isFire()) {
+			windowStateReference.setCurrentNamespace(window);
+			Iterable<W> baseWindows =  windowStateReference.keys();
+			if (windowState instanceof MapState) {
+				throw new RuntimeException("Map State not supported");
+			}
+			windowState.setCurrentNamespace(window);
+			ACC contents = null;
+			List<W> baseWindowList = IteratorUtils.toList(baseWindows.iterator());
+			Collections.sort(baseWindowList, (m, n) -> m.maxTimestamp() - n.maxTimestamp() < 0 ? -1 : 1);
+			for (W baseWindow : baseWindowList) {
+				windowState.setCurrentNamespace(baseWindow);
+				ACC content = windowState.get();
+				if (contents == null) {
+					contents = content;
+					continue;
+				}
+				if (windowStateDescriptor instanceof AggregatingStateDescriptor) {
+					contents = (ACC) ((AggregatingStateDescriptor) windowStateDescriptor).getAggregateFunction().merge(contents, content);
+				} else if (windowStateDescriptor instanceof ReducingStateDescriptor) {
+					contents = (ACC) ((ReducingStateDescriptor) windowStateDescriptor).getReduceFunction().reduce(contents, content);
+				} else if (windowStateDescriptor instanceof ListStateDescriptor) {
+					((List<IN>) contents).addAll((List<IN>) content);
+				} else if (windowStateDescriptor instanceof MapStateDescriptor) {
+					throw new RuntimeException("Map state not supported in new window operator yet.");
+				} else {
+					throw new RuntimeException("Function not supported yet");
+				}
+
+//				if (content instanceof Collection && contents == null) {
+//					contents = (Collection<IN>) content;
+//				} else if (content instanceof Collection) {
+//					contents.addAll((Collection<IN>) content);
+//				} else  {
+//					throw new RuntimeException("The ACC is not a collection.");
+//				}
+			}
+
+			if (contents == null) {
+				return;
+			}
+			emitWindowContents(window, (ACC) contents);
+		}
+
+		if (triggerResult.isPurge()) {
+			clearSlidingWindowState(window);
+		}
+	}
+
 	@Override
 	public void onEventTime(InternalTimer<K, W> timer) throws Exception {
 		triggerContext.key = timer.getKey();
 		triggerContext.window = timer.getNamespace();
 
-		MergingWindowSet<W> mergingWindows;
+		if (windowAssigner instanceof SlidingWindowAssigner) {
+			TriggerResult triggerResult = triggerContext.onEventTime(timer.getTimestamp());
 
-		if (windowAssigner instanceof MergingWindowAssigner) {
-			mergingWindows = getMergingWindowSet();
-			W stateWindow = mergingWindows.getStateWindow(triggerContext.window);
-			if (stateWindow == null) {
-				// Timer firing for non-existent window, this can only happen if a
-				// trigger did not clean up timers. We have already cleared the merging
-				// window and therefore the Trigger state, however, so nothing to do.
-				return;
-			} else {
-				windowState.setCurrentNamespace(stateWindow);
+			processSlidingWindowTriggerResult(triggerResult, triggerContext.window);
+
+			if (windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
+				clearAllStateForSlidingWindow(triggerContext.window);
 			}
 		} else {
-			windowState.setCurrentNamespace(triggerContext.window);
-			mergingWindows = null;
-		}
+			MergingWindowSet<W> mergingWindows;
+			W slidingWindow;
 
-		TriggerResult triggerResult = triggerContext.onEventTime(timer.getTimestamp());
-
-		if (triggerResult.isFire()) {
-			ACC contents = windowState.get();
-			if (contents != null) {
-				emitWindowContents(triggerContext.window, contents);
+			if (windowAssigner instanceof MergingWindowAssigner) {
+				mergingWindows = getMergingWindowSet();
+				W stateWindow = mergingWindows.getStateWindow(triggerContext.window);
+				if (stateWindow == null) {
+					// Timer firing for non-existent window, this can only happen if a
+					// trigger did not clean up timers. We have already cleared the merging
+					// window and therefore the Trigger state, however, so nothing to do.
+					return;
+				} else {
+					windowState.setCurrentNamespace(stateWindow);
+				}
+			} else {
+				windowState.setCurrentNamespace(triggerContext.window);
+				mergingWindows = null;
 			}
-		}
 
-		if (triggerResult.isPurge()) {
-			windowState.clear();
-		}
+			TriggerResult triggerResult = triggerContext.onEventTime(timer.getTimestamp());
 
-		if (windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
-			clearAllState(triggerContext.window, windowState, mergingWindows);
-		}
+			if (triggerResult.isFire()) {
+				ACC contents = windowState.get();
+				if (contents != null) {
+					emitWindowContents(triggerContext.window, contents);
+				}
+			}
 
-		if (mergingWindows != null) {
-			// need to make sure to update the merging state in state
-			mergingWindows.persist();
+			if (triggerResult.isPurge()) {
+				windowState.clear();
+			}
+
+			if (windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
+				clearAllState(triggerContext.window, windowState, mergingWindows);
+			}
+
+			if (mergingWindows != null) {
+				// need to make sure to update the merging state in state
+				mergingWindows.persist();
+			}
 		}
 	}
 
@@ -474,44 +600,54 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 		triggerContext.key = timer.getKey();
 		triggerContext.window = timer.getNamespace();
 
-		MergingWindowSet<W> mergingWindows;
+		if (windowAssigner instanceof SlidingWindowAssigner) {
+			TriggerResult triggerResult = triggerContext.onProcessingTime(timer.getTimestamp());
 
-		if (windowAssigner instanceof MergingWindowAssigner) {
-			mergingWindows = getMergingWindowSet();
-			W stateWindow = mergingWindows.getStateWindow(triggerContext.window);
-			if (stateWindow == null) {
-				// Timer firing for non-existent window, this can only happen if a
-				// trigger did not clean up timers. We have already cleared the merging
-				// window and therefore the Trigger state, however, so nothing to do.
-				return;
-			} else {
-				windowState.setCurrentNamespace(stateWindow);
+			processSlidingWindowTriggerResult(triggerResult, triggerContext.window);
+
+			if (!windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
+				clearAllStateForSlidingWindow(triggerContext.window);
 			}
 		} else {
-			windowState.setCurrentNamespace(triggerContext.window);
-			mergingWindows = null;
-		}
+			MergingWindowSet<W> mergingWindows;
 
-		TriggerResult triggerResult = triggerContext.onProcessingTime(timer.getTimestamp());
-
-		if (triggerResult.isFire()) {
-			ACC contents = windowState.get();
-			if (contents != null) {
-				emitWindowContents(triggerContext.window, contents);
+			if (windowAssigner instanceof MergingWindowAssigner) {
+				mergingWindows = getMergingWindowSet();
+				W stateWindow = mergingWindows.getStateWindow(triggerContext.window);
+				if (stateWindow == null) {
+					// Timer firing for non-existent window, this can only happen if a
+					// trigger did not clean up timers. We have already cleared the merging
+					// window and therefore the Trigger state, however, so nothing to do.
+					return;
+				} else {
+					windowState.setCurrentNamespace(stateWindow);
+				}
+			} else {
+				windowState.setCurrentNamespace(triggerContext.window);
+				mergingWindows = null;
 			}
-		}
 
-		if (triggerResult.isPurge()) {
-			windowState.clear();
-		}
+			TriggerResult triggerResult = triggerContext.onProcessingTime(timer.getTimestamp());
 
-		if (!windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
-			clearAllState(triggerContext.window, windowState, mergingWindows);
-		}
+			if (triggerResult.isFire()) {
+				ACC contents = windowState.get();
+				if (contents != null) {
+					emitWindowContents(triggerContext.window, contents);
+				}
+			}
 
-		if (mergingWindows != null) {
-			// need to make sure to update the merging state in state
-			mergingWindows.persist();
+			if (triggerResult.isPurge()) {
+				windowState.clear();
+			}
+
+			if (!windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
+				clearAllState(triggerContext.window, windowState, mergingWindows);
+			}
+
+			if (mergingWindows != null) {
+				// need to make sure to update the merging state in state
+				mergingWindows.persist();
+			}
 		}
 	}
 
@@ -534,6 +670,34 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 			mergingWindows.retireWindow(window);
 			mergingWindows.persist();
 		}
+	}
+
+	private void clearSlidingWindowState(W window) throws Exception {
+		windowStateReference.setCurrentNamespace(window);
+		Iterable<Map.Entry<W, String>> baseWindowEntries = baseWindowEntries = windowStateReference.entries();
+		for (Map.Entry<W, String> baseWindowEntry : baseWindowEntries) {
+			W baseWindow = baseWindowEntry.getKey();
+			baseWindowReferenceCount.setCurrentNamespace(baseWindow);
+			Integer referenceCount = baseWindowReferenceCount.value();
+			if (referenceCount == null || referenceCount == 0) {
+				throw new RuntimeException("The reference count is not correct");
+			}
+			if (referenceCount == 1) {
+				windowState.setCurrentNamespace(baseWindow);
+				windowState.clear();
+				baseWindowReferenceCount.clear();
+			} else {
+				baseWindowReferenceCount.update(referenceCount - 1);
+			}
+		}
+		windowStateReference.clear();
+	}
+
+	private void clearAllStateForSlidingWindow(W window) throws Exception {
+		clearSlidingWindowState(window);
+		triggerContext.clear();
+		processContext.window = window;
+		processContext.clear();
 	}
 
 	/**
