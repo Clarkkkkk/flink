@@ -24,6 +24,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.MemorySize;
 import org.apache.flink.table.api.TableException;
 import org.apache.flink.table.api.TableSchema;
+import org.apache.flink.table.api.TableSchemaBuilder;
 import org.apache.flink.table.api.ValidationException;
 import org.apache.flink.table.utils.EncodingUtils;
 import org.apache.flink.table.utils.TypeStringUtils;
@@ -489,7 +490,7 @@ public class DescriptorProperties {
 		}
 
 		// validate fields and build schema
-		final TableSchema.Builder schemaBuilder = TableSchema.builder();
+		final TableSchemaBuilder schemaBuilder = TableSchema.builder();
 		for (int i = 0; i < fieldCount; i++) {
 			final String nameKey = key + '.' + i + '.' + TABLE_SCHEMA_NAME;
 			final String typeKey = key + '.' + i + '.' + TABLE_SCHEMA_TYPE;

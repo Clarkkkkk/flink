@@ -38,7 +38,7 @@ import java.util.Set;
   * A table schema that represents a table's structure with field names and types.
   */
 @PublicEvolving
-public class TableSchema {
+public class DeprecatedTableSchema {
 
 	private static final String ATOMIC_TYPE_FIELD_NAME = "f0";
 
@@ -48,7 +48,7 @@ public class TableSchema {
 
 	private final Map<String, Integer> fieldNameToIndex;
 
-	public TableSchema(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
+	public DeprecatedTableSchema(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
 		this.fieldNames = Preconditions.checkNotNull(fieldNames);
 		this.fieldTypes = Preconditions.checkNotNull(fieldTypes);
 
@@ -90,8 +90,8 @@ public class TableSchema {
 	/**
 	 * Returns a deep copy of the table schema.
 	 */
-	public TableSchema copy() {
-		return new TableSchema(fieldNames.clone(), fieldTypes.clone());
+	public DeprecatedTableSchema copy() {
+		return new DeprecatedTableSchema(fieldNames.clone(), fieldTypes.clone());
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class TableSchema {
 	}
 
 	/**
-	 * @deprecated Use {@link TableSchema#getFieldTypes()} instead. Can be dropped after 1.7.
+	 * @deprecated Use {@link DeprecatedTableSchema#getFieldTypes()} instead. Can be dropped after 1.7.
 	 */
 	@Deprecated
 	public TypeInformation<?>[] getTypes() {
@@ -160,7 +160,7 @@ public class TableSchema {
 	}
 
 	/**
-	 * @deprecated Use {@link TableSchema#getFieldNames()} instead. Can be dropped after 1.7.
+	 * @deprecated Use {@link DeprecatedTableSchema#getFieldNames()} instead. Can be dropped after 1.7.
 	 */
 	@Deprecated
 	public String[] getColumnNames() {
@@ -192,7 +192,7 @@ public class TableSchema {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		TableSchema schema = (TableSchema) o;
+		DeprecatedTableSchema schema = (DeprecatedTableSchema) o;
 		return Arrays.equals(fieldNames, schema.fieldNames) &&
 			Arrays.equals(fieldTypes, schema.fieldTypes);
 	}
@@ -207,13 +207,13 @@ public class TableSchema {
 	/**
 	 * Creates a table schema from a {@link TypeInformation} instance. If the type information is
 	 * a {@link CompositeType}, the field names and types for the composite type are used to
-	 * construct the {@link TableSchema} instance. Otherwise, a table schema with a single field
+	 * construct the {@link DeprecatedTableSchema} instance. Otherwise, a table schema with a single field
 	 * is created. The field name is "f0" and the field type the provided type.
 	 *
 	 * @param typeInfo The {@link TypeInformation} from which the table schema is generated.
 	 * @return The table schema that was generated from the given {@link TypeInformation}.
 	 */
-	public static TableSchema fromTypeInfo(TypeInformation<?> typeInfo) {
+	public static DeprecatedTableSchema fromTypeInfo(TypeInformation<?> typeInfo) {
 		if (typeInfo instanceof CompositeType<?>) {
 			final CompositeType<?> compositeType = (CompositeType<?>) typeInfo;
 			// get field names and types from composite type
@@ -222,10 +222,10 @@ public class TableSchema {
 			for (int i = 0; i < fieldTypes.length; i++) {
 				fieldTypes[i] = compositeType.getTypeAt(i);
 			}
-			return new TableSchema(fieldNames, fieldTypes);
+			return new DeprecatedTableSchema(fieldNames, fieldTypes);
 		} else {
 			// create table schema with a single field named "f0" of the given type.
-			return new TableSchema(
+			return new DeprecatedTableSchema(
 				new String[]{ATOMIC_TYPE_FIELD_NAME},
 				new TypeInformation<?>[]{typeInfo});
 		}
@@ -238,7 +238,7 @@ public class TableSchema {
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Builder for creating a {@link TableSchema}.
+	 * Builder for creating a {@link DeprecatedTableSchema}.
 	 */
 	public static class Builder {
 
@@ -264,10 +264,10 @@ public class TableSchema {
 		}
 
 		/**
-		 * Returns a {@link TableSchema} instance.
+		 * Returns a {@link DeprecatedTableSchema} instance.
 		 */
-		public TableSchema build() {
-			return new TableSchema(
+		public DeprecatedTableSchema build() {
+			return new DeprecatedTableSchema(
 				fieldNames.toArray(new String[0]),
 				fieldTypes.toArray(new TypeInformation<?>[0]));
 		}

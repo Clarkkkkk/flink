@@ -21,6 +21,7 @@ package org.apache.flink.table.factories;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.table.api.TableSchema;
+import org.apache.flink.table.api.TableSchemaBuilder;
 import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.descriptors.FormatDescriptorValidator;
 
@@ -132,7 +133,7 @@ public abstract class TableFormatFactoryBase<T> implements TableFormatFactory<T>
 		final DescriptorProperties descriptorProperties = new DescriptorProperties();
 		descriptorProperties.putProperties(properties);
 
-		final TableSchema.Builder builder = TableSchema.builder();
+		final TableSchemaBuilder builder = TableSchema.builder();
 
 		final TableSchema baseSchema = descriptorProperties.getTableSchema(SCHEMA);
 		for (int i = 0; i < baseSchema.getFieldCount(); i++) {

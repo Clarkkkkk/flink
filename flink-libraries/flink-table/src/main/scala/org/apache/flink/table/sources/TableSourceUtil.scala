@@ -118,7 +118,7 @@ object TableSourceUtil {
               s"'$rowtimeAttribute' but field '$rowtimeAttribute' does not exist in table.")
           }
           // ensure that field is of type TIMESTAMP
-          if (schema.getFieldTypes()(rowtimeIdx) != Types.SQL_TIMESTAMP) {
+          if (schema.getFieldTypes.apply(rowtimeIdx) != Types.SQL_TIMESTAMP) {
             throw new ValidationException(s"Found a RowtimeAttributeDescriptor for field " +
               s"'$rowtimeAttribute' but field '$rowtimeAttribute' is not of type TIMESTAMP.")
           }
@@ -142,7 +142,7 @@ object TableSourceUtil {
             s"'$proctimeAttribute' but field '$proctimeAttribute' does not exist in table.")
         }
         // ensure that field is of type TIMESTAMP
-        if (schema.getFieldTypes()(proctimeIdx) != Types.SQL_TIMESTAMP) {
+        if (schema.getFieldTypes.apply(proctimeIdx) != Types.SQL_TIMESTAMP) {
           throw new ValidationException(s"Found a RowtimeAttributeDescriptor for field " +
             s"'$proctimeAttribute' but field '$proctimeAttribute' is not of type TIMESTAMP.")
         }

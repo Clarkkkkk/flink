@@ -37,6 +37,7 @@ import org.apache.flink.table.api.QueryConfig;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableSchema;
+import org.apache.flink.table.api.TableSchemaBuilder;
 import org.apache.flink.table.calcite.FlinkTypeFactory;
 import org.apache.flink.table.client.SqlClientException;
 import org.apache.flink.table.client.config.Environment;
@@ -545,7 +546,7 @@ public class LocalExecutor implements Executor {
 	}
 
 	private static TableSchema removeTimeAttributes(TableSchema schema) {
-		final TableSchema.Builder builder = TableSchema.builder();
+		final TableSchemaBuilder builder = TableSchema.builder();
 		for (int i = 0; i < schema.getFieldCount(); i++) {
 			final TypeInformation<?> type = schema.getFieldTypes()[i];
 			final TypeInformation<?> convertedType;
