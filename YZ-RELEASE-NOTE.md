@@ -139,3 +139,4 @@ yz-flink is a company version based on Apache Flink
     [FLINK-10208][build] Bump mockito to 2.21.0 / powermock to 2.0.0-beta.5 Chesnay Schepler* 2018/10/8, 7:39 PM
     [FLINK-10848] Remove container requests after successful container allocation Till Rohrmann* 2019/1/8, 8:06 PM
     [FLINK-10726] [table] Include flink-table-common in flink-table jar Timo Walther 2018/10/30, 9:38 PM
+    [SJJCSS-756]Flink升级TableSchema不兼容
