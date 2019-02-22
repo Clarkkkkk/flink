@@ -68,12 +68,12 @@
 		<!--</file>-->
 
 		<!-- ML -->
-		<file>
-			<source>../flink-libraries/flink-ml/target/flink-ml_${scala.binary.version}-${project.version}-jar-with-dependencies.jar</source>
-			<outputDirectory>opt/</outputDirectory>
-			<destName>flink-ml_${scala.binary.version}-${project.version}.jar</destName>
-			<fileMode>0644</fileMode>
-		</file>
+		<!--<file>-->
+			<!--<source>../flink-libraries/flink-ml/target/flink-ml_${scala.binary.version}-${project.version}-jar-with-dependencies.jar</source>-->
+			<!--<outputDirectory>opt/</outputDirectory>-->
+			<!--<destName>flink-ml_${scala.binary.version}-${project.version}.jar</destName>-->
+			<!--<fileMode>0644</fileMode>-->
+		<!--</file>-->
 
 		<!-- Metrics -->
 		<!--<file>-->
@@ -125,34 +125,34 @@
 			<!--<fileMode>0644</fileMode>-->
 		<!--</file>-->
 
-		<file>
-			<source>../flink-filesystems/flink-s3-fs-hadoop/target/flink-s3-fs-hadoop-${project.version}.jar</source>
-			<outputDirectory>opt/</outputDirectory>
-			<destName>flink-s3-fs-hadoop-${project.version}.jar</destName>
-			<fileMode>0644</fileMode>
-		</file>
+		<!--<file>-->
+			<!--<source>../flink-filesystems/flink-s3-fs-hadoop/target/flink-s3-fs-hadoop-${project.version}.jar</source>-->
+			<!--<outputDirectory>opt/</outputDirectory>-->
+			<!--<destName>flink-s3-fs-hadoop-${project.version}.jar</destName>-->
+			<!--<fileMode>0644</fileMode>-->
+		<!--</file>-->
 
-		<file>
-			<source>../flink-filesystems/flink-s3-fs-presto/target/flink-s3-fs-presto-${project.version}.jar</source>
-			<outputDirectory>opt/</outputDirectory>
-			<destName>flink-s3-fs-presto-${project.version}.jar</destName>
-			<fileMode>0644</fileMode>
-		</file>
+		<!--<file>-->
+			<!--<source>../flink-filesystems/flink-s3-fs-presto/target/flink-s3-fs-presto-${project.version}.jar</source>-->
+			<!--<outputDirectory>opt/</outputDirectory>-->
+			<!--<destName>flink-s3-fs-presto-${project.version}.jar</destName>-->
+			<!--<fileMode>0644</fileMode>-->
+		<!--</file>-->
 
-		<file>
-			<source>../flink-filesystems/flink-swift-fs-hadoop/target/flink-swift-fs-hadoop-${project.version}.jar</source>
-			<outputDirectory>opt/</outputDirectory>
-			<destName>flink-swift-fs-hadoop-${project.version}.jar</destName>
-			<fileMode>0644</fileMode>
-		</file>
+		<!--<file>-->
+			<!--<source>../flink-filesystems/flink-swift-fs-hadoop/target/flink-swift-fs-hadoop-${project.version}.jar</source>-->
+			<!--<outputDirectory>opt/</outputDirectory>-->
+			<!--<destName>flink-swift-fs-hadoop-${project.version}.jar</destName>-->
+			<!--<fileMode>0644</fileMode>-->
+		<!--</file>-->
 
 		<!-- Queryable State -->
-		<file>
-			<source>../flink-queryable-state/flink-queryable-state-runtime/target/flink-queryable-state-runtime_${scala.binary.version}-${project.version}.jar</source>
-			<outputDirectory>opt/</outputDirectory>
-			<destName>flink-queryable-state-runtime_${scala.binary.version}-${project.version}.jar</destName>
-			<fileMode>0644</fileMode>
-		</file>
+		<!--<file>-->
+			<!--<source>../flink-queryable-state/flink-queryable-state-runtime/target/flink-queryable-state-runtime_${scala.binary.version}-${project.version}.jar</source>-->
+			<!--<outputDirectory>opt/</outputDirectory>-->
+			<!--<destName>flink-queryable-state-runtime_${scala.binary.version}-${project.version}.jar</destName>-->
+			<!--<fileMode>0644</fileMode>-->
+		<!--</file>-->
 
 		<!-- Streaming Python API -->
 		<file>
