@@ -104,6 +104,8 @@ public class HBaseUpsertTableSink implements UpsertStreamTableSink<Row> {
 					throw new RuntimeException("Column family and qualifer cannot be derived with field " + fieldNames[i]
 						+ " and delimiter " + delimiter + ".");
 				}
+				columnFamilies[i] = split[0];
+				qualifiers[i] = split[1];
 			}
 		}
 		if (rowKeyIndex == -1) {

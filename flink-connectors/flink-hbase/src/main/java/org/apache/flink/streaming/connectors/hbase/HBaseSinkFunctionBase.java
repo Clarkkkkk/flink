@@ -20,7 +20,6 @@ package org.apache.flink.streaming.connectors.hbase;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.concurrent.FutureUtils;
-import org.apache.flink.runtime.messages.Acknowledge;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
@@ -38,13 +37,16 @@ import org.apache.hadoop.hbase.client.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * HBaseSinkFunctionBase is the common abstract class of {@link HBasePojoSinkFunction}, {@link HBaseTupleSinkFunction},
@@ -79,11 +81,14 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 	/** The timer that triggers periodic flush to HBase. */
 	private ScheduledThreadPoolExecutor executor;
 
+	private ExecutorService flushExecutor;
+
 	/** The lock to safeguard the flush commits. */
-	private final transient Object lock = new Object();
+	private transient Object lock;
 
 	private Connection connection;
 	private transient Table hTable;
+	private boolean isBuildingTable = false;
 
 	private HBaseClientWrapper client;
 	private List<Mutation> mutaionBuffer = new LinkedList<>();
@@ -91,10 +96,12 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 
 	private final boolean batchFlushEnable;
 	private long batchFlushMaxMutations;
-	private long batchFlushMaxSizeMb;
+	private long batchFlushMaxSizeInBits;
 	private long batchFlushIntervalMillis;
 	private int batchFlushMaxRetries;
 	private long batchFlushMaxTimeoutMillis;
+
+	private boolean isRunning = false;
 
 	public HBaseSinkFunctionBase(
 		String clusterKey,
@@ -108,6 +115,7 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 		TypeInformation<?>[] fieldTypes) {
 		this(null, userConfig, rowKeyIndex, outputFieldNames, fieldNames, columnFamilies, qualifiers, fieldTypes);
 		this.client = new HBaseClientWrapper().clusterKey(clusterKey).tableName(tableName);
+		this.isBuildingTable = true;
 	}
 
 	public HBaseSinkFunctionBase(
@@ -145,7 +153,7 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 
 		batchFlushEnable = userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_ENABLE, "false").equals("true");
 		batchFlushMaxMutations = Long.parseLong(userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_MAX_MUTATIONS, "128"));
-		batchFlushMaxSizeMb = Long.parseLong(userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_MAX_SIZE_MB, "2"));
+		batchFlushMaxSizeInBits = Long.parseLong(userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_MAX_SIZE_MB, "2")) * 1024 * 1024 * 8;
 		batchFlushIntervalMillis = Long.parseLong(userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_INTERVAL_MS, "1000"));
 		batchFlushMaxRetries = Integer.parseInt(userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_MAX_RETRIES, "3"));
 		batchFlushMaxTimeoutMillis = Long.parseLong(userConfig.getOrDefault(CONFIG_KEY_BATCH_FLUSH_MAX_TIMEOUT_MS, "5000"));
@@ -153,7 +161,8 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 
 	@Override
 	public void open(Configuration configuration) throws Exception {
-		if (hTable == null) {
+		this.lock = new Object();
+		if (isBuildingTable) {
 			if (client != null) {
 				this.connection = client.buildConnection();
 			}
@@ -161,38 +170,57 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 				this.hTable = client.buildTable(connection);
 			}
 		}
-		assert hTable != null;
+		if (hTable == null) {
+			throw new RuntimeException("Cannot build connection for hbase sink, please check the configuraiton.");
+		}
 		if (batchFlushEnable) {
 			((HTable) hTable).setAutoFlush(false, false);
 		} else {
 			((HTable) hTable).setAutoFlush(true, false);
 		}
 		this.executor = new ScheduledThreadPoolExecutor(1);
+		this.flushExecutor = Executors.newFixedThreadPool(3);
 		if (batchFlushEnable && batchFlushIntervalMillis > 0) {
 			executor.scheduleAtFixedRate(() -> {
 				if (this.hTable != null && this.hTable instanceof HTable) {
 					synchronized (lock) {
 						try {
 							flushToHBaseWithRetryAndTimeout();
-						} catch (RuntimeException e){
+						} catch (Exception e){
 							log.warn("Scheduled flush operation to HBase cannot be finished.", e);
 						}
 					}
 				}
-			}, 0, batchFlushIntervalMillis, TimeUnit.MILLISECONDS);
+			}, batchFlushIntervalMillis, batchFlushIntervalMillis, TimeUnit.MILLISECONDS);
 		}
+		isRunning = true;
 	}
 
 	@Override
-	public void invoke(IN value, Context context) throws IOException {
+	public void invoke(IN value, Context context) throws Exception {
 		Mutation mutation = extract(value);
 		long mutationSize = mutation.heapSize();
 		if (batchFlushEnable) {
-			if (estimateSize != 0 && (estimateSize + mutationSize > batchFlushMaxSizeMb || mutaionBuffer.size() + 1 > batchFlushMaxMutations)) {
-				flushToHBaseWithRetryAndTimeout();
+			if (estimateSize != 0 && (estimateSize + mutationSize > batchFlushMaxSizeInBits || mutaionBuffer.size() + 1 > batchFlushMaxMutations)) {
+				synchronized (lock){
+					if (estimateSize != 0 && (estimateSize + mutationSize > batchFlushMaxSizeInBits
+						|| mutaionBuffer.size() + 1 > batchFlushMaxMutations)) {
+						long start = System.currentTimeMillis();
+						Exception testException = null;
+						try {
+							flushToHBaseWithRetryAndTimeout();
+						} catch (Exception e) {
+							testException = e;
+						}
+						long end = System.currentTimeMillis();
+						log.debug("ClarkTest: Flush tasks " + (end - start) + " milliseconds with exception: " + testException);
+					}
+				}
 			}
-			mutaionBuffer.add(mutation);
-			estimateSize += mutation.heapSize();
+			synchronized (lock) {
+				mutaionBuffer.add(mutation);
+				estimateSize += mutation.heapSize();
+			}
 		} else if (mutation instanceof Put){
 			hTable.put((Put) mutation);
 		} else if (mutation instanceof Delete) {
@@ -234,35 +262,47 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 	protected abstract Object produceElementWithIndex(IN value, int index);
 
 	// The HBase client operation timeout doesn't include the time of getting server state from zookeeper.
-	private void flushToHBaseWithRetryAndTimeout() {
-		CompletableFuture<Acknowledge> flushFuture = FutureUtils
-			.orTimeout(
-				FutureUtils.retry(() -> flushToHBase(), batchFlushMaxRetries, executor),
-				batchFlushMaxTimeoutMillis,
-				TimeUnit.MILLISECONDS);
-		flushFuture.whenCompleteAsync((ack, failure) -> {
-			if (failure != null) {
-				throw new RuntimeException("Flush operation to HBase cannot be finished.", failure);
+	private void flushToHBaseWithRetryAndTimeout() throws ExecutionException, InterruptedException {
+		long start = System.currentTimeMillis();
+		try {
+			CompletableFuture<Void> flushFuture = FutureUtils
+				.retry(() -> CompletableFuture.runAsync(() -> flushToHBase(), flushExecutor), batchFlushMaxRetries, flushExecutor);
+			if (!flushFuture.isDone()) {
+				log.debug("ClarkTest: start to wait for flush futre");
+				flushFuture.get(batchFlushMaxTimeoutMillis, TimeUnit.MILLISECONDS);
 			}
-		});
+		} catch (TimeoutException e) {
+			throw new RuntimeException("Flush operation to HBase cannot be finished.", e);
+		}
+		long end = System.currentTimeMillis();
+		log.debug("ClarkTest: takes " + (end - start) + " ms");
 	}
 
-	private CompletableFuture<Acknowledge> flushToHBase() {
+	private void flushToHBase() {
 		try {
-			hTable.batch(mutaionBuffer, new Object[mutaionBuffer.size()]);
-			mutaionBuffer.clear();
-			estimateSize = 0;
+			if (isRunning && mutaionBuffer.size() > 0) {
+				if (hTable == null) {
+					log.error("HBase table cannot be null during flush.");
+				} else {
+					log.debug("ClarkTest: mutation size is " + mutaionBuffer.size());
+					hTable.batch(mutaionBuffer, new Object[mutaionBuffer.size()]);
+					mutaionBuffer.clear();
+					estimateSize = 0;
+				}
+			}
 		} catch (Exception e) {
+			log.warn("Fail to flush data into HBase due to: ", e);
 			throw new RuntimeException(e);
 		}
-		return CompletableFuture.completedFuture(Acknowledge.get());
 	}
 
 	@Override public void close() throws Exception {
 		super.close();
+		isRunning = false;
 		try {
 			if (this.hTable != null) {
 				this.hTable.close();
+				this.hTable = null;
 			}
 		} catch (Throwable t) {
 			log.error("Error while closing HBase table.", t);
@@ -270,6 +310,7 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 		try {
 			if (this.connection != null) {
 				this.connection.close();
+				this.connection = null;
 			}
 		} catch (Throwable t) {
 			log.error("Error while closing HBase connection.", t);
@@ -277,7 +318,7 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 	}
 
 	@Override
-	public void snapshotState(FunctionSnapshotContext context) {
+	public void snapshotState(FunctionSnapshotContext context) throws ExecutionException, InterruptedException {
 		if (batchFlushEnable && this.hTable != null && this.hTable instanceof HTable) {
 			synchronized (lock) {
 				flushToHBaseWithRetryAndTimeout();
