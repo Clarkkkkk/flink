@@ -357,9 +357,10 @@ abstract class StreamTableEnvironment(
         // check that we have keys if the table has changes (is not append-only)
         tableKeys match {
           case Some(keys) => upsertSink.setKeyFields(keys)
-          case None if isAppendOnlyTable => upsertSink.setKeyFields(null)
-          case None if !isAppendOnlyTable => throw new TableException(
-            "UpsertStreamTableSink requires that Table has full primary keys if it is updated.")
+          case None => upsertSink.setKeyFields(null)
+//          case None if isAppendOnlyTable => upsertSink.setKeyFields(null)
+//          case None if !isAppendOnlyTable => throw new TableException(
+//            "UpsertStreamTableSink requires that Table has full primary keys if it is updated.")
         }
         val outputType = sink.getOutputType
         val resultType = getResultType(table.getRelNode, optimizedPlan)
