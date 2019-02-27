@@ -20,4 +20,6 @@
 mvn clean install -DskipTests -Dhadoop.version=2.6.5
 cd flink-dist
 mvn clean install -Dhadoop.version=2.6.5
-cp -r target/flink-*bin/flink* ~/Desktop/flink_releases/
+tar -zcvf yz-flink.tar.gz target/flink-*bin/flink*
+cp yz-flink.tar.gz ~/Desktop/flink_releases/
+rm -f yz-flink.tar.gz
