@@ -17,4 +17,5 @@
 # limitations under the License.
 ################################################################################
 
-mvn clean deploy -DskipTests -Dhadoop.version=2.6.5
+mvn clean install -DskipTests -Dhadoop.version=2.6.5
+mvn deploy -DskipTests -Dhadoop.version=2.6.5
