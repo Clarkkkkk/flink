@@ -18,7 +18,6 @@
 
 package org.apache.flink.streaming.runtime.operators.windowing;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.api.common.ExecutionConfig;
@@ -76,11 +75,12 @@ import org.apache.flink.streaming.runtime.operators.windowing.functions.Internal
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.util.OutputTag;
 
+import org.apache.commons.collections.IteratorUtils;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -126,7 +126,7 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 
 	private final MapStateDescriptor<W, String> windowStateReferenceDescriptor;
 
-	private final ValueStateDescriptor<Integer> baseWindowReferenceCountDescriptor;
+	private final ValueStateDescriptor<Integer> overlappingWindowReferenceCountDescriptor;
 
 	/** For serializing the key in checkpoints. */
 	protected final TypeSerializer<K> keySerializer;
@@ -162,9 +162,11 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 	/** The state in which the window contents is stored. Each window is a namespace */
 	private transient InternalAppendingState<K, W, IN, ACC, ACC> windowState;
 
+	/** The state map an user defined window to a Map of actual overlapping window. */
 	private transient InternalMapState<K, W, W, String> windowStateReference;
 
-	private transient InternalValueState<K, W, Integer> baseWindowReferenceCount;
+	/** The state stores the reference count for overlapping window. */
+	private transient InternalValueState<K, W, Integer> overlappingWindowReferenceCount;
 
 	/**
 	 * The {@link #windowState}, typed to merging state for merging windows.
@@ -225,7 +227,7 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 		this.keySerializer = checkNotNull(keySerializer);
 		this.windowStateDescriptor = windowStateDescriptor;
 		this.windowStateReferenceDescriptor = new MapStateDescriptor<>("TestWindowRefMapState", windowSerializer, new StringSerializer());
-		this.baseWindowReferenceCountDescriptor = new ValueStateDescriptor<>("TestBaseWindowRefValueState", new IntSerializer());
+		this.overlappingWindowReferenceCountDescriptor = new ValueStateDescriptor<>("TestBaseWindowRefValueState", new IntSerializer());
 		this.trigger = checkNotNull(trigger);
 		this.allowedLateness = allowedLateness;
 		this.lateDataOutputTag = lateDataOutputTag;
@@ -263,8 +265,8 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 			windowStateReference = (InternalMapState<K, W, W, String>) getOrCreateKeyedState(windowSerializer, windowStateReferenceDescriptor);
 		}
 
-		if (baseWindowReferenceCountDescriptor != null) {
-			baseWindowReferenceCount = (InternalValueState<K, W, Integer>) getOrCreateKeyedState(windowSerializer, baseWindowReferenceCountDescriptor);
+		if (overlappingWindowReferenceCountDescriptor != null) {
+			overlappingWindowReferenceCount = (InternalValueState<K, W, Integer>) getOrCreateKeyedState(windowSerializer, overlappingWindowReferenceCountDescriptor);
 		}
 
 		// create the typed and helper states for merging windows
@@ -406,32 +408,25 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 			// need to make sure to update the merging state in state
 			mergingWindows.persist();
 		} else if (windowAssigner instanceof SlidingWindowAssigner) {
-			SlidingWindowAssigner slidingWindowAssigner = (SlidingWindowAssigner) this.windowAssigner;
-			W baseWindow = null;
-			boolean isFirst = true;
-			for (W window: elementWindows) {
-				if (isFirst) {
-					baseWindow = window;
-					isFirst = false;
-					windowState.setCurrentNamespace(baseWindow);
-					windowState.add(element.getValue());
-				} else {
-					// drop if the window is already late
-					if (isWindowLate(window)) {
-						continue;
+			SlidingWindowAssigner<? super IN, W> slidingWindowAssigner = (SlidingWindowAssigner<? super IN, W>) this.windowAssigner;
+			W overlappingWindow = slidingWindowAssigner.getLatestOverlappingWindow();
+			windowState.setCurrentNamespace(overlappingWindow);
+			windowState.add(element.getValue());
+			for (W window : elementWindows) {
+				if (isWindowLate(window)) {
+					continue;
+				}
+				isSkippedElement = false;
+				// window state reference use a user defined window as reference and and overlapping window as key
+				windowStateReference.setCurrentNamespace(window);
+				if (!windowStateReference.contains(overlappingWindow)) {
+					windowStateReference.put(overlappingWindow, "");
+					overlappingWindowReferenceCount.setCurrentNamespace(overlappingWindow);
+					Integer referenceCount = overlappingWindowReferenceCount.value();
+					if (referenceCount == null) {
+						referenceCount = 0;
 					}
-					isSkippedElement = false;
-
-					windowStateReference.setCurrentNamespace(window);
-					if (!windowStateReference.contains(baseWindow)) {
-						windowStateReference.put(baseWindow, "");
-						baseWindowReferenceCount.setCurrentNamespace(baseWindow);
-						Integer referenceCount = baseWindowReferenceCount.value();
-						if (referenceCount == null) {
-							referenceCount = 0;
-						}
-						baseWindowReferenceCount.update(referenceCount + 1);
-					}
+					overlappingWindowReferenceCount.update(referenceCount + 1);
 
 					triggerContext.key = key;
 					triggerContext.window = window;
@@ -674,20 +669,19 @@ public class WindowOperator<K, IN, ACC, OUT, W extends Window>
 
 	private void clearSlidingWindowState(W window) throws Exception {
 		windowStateReference.setCurrentNamespace(window);
-		Iterable<Map.Entry<W, String>> baseWindowEntries = baseWindowEntries = windowStateReference.entries();
-		for (Map.Entry<W, String> baseWindowEntry : baseWindowEntries) {
-			W baseWindow = baseWindowEntry.getKey();
-			baseWindowReferenceCount.setCurrentNamespace(baseWindow);
-			Integer referenceCount = baseWindowReferenceCount.value();
+		Iterable<W> overlappingWindows = windowStateReference.keys();
+		for (W overlappingWindow : overlappingWindows) {
+			overlappingWindowReferenceCount.setCurrentNamespace(overlappingWindow);
+			Integer referenceCount = overlappingWindowReferenceCount.value();
 			if (referenceCount == null || referenceCount == 0) {
 				throw new RuntimeException("The reference count is not correct");
 			}
 			if (referenceCount == 1) {
-				windowState.setCurrentNamespace(baseWindow);
+				windowState.setCurrentNamespace(overlappingWindow);
 				windowState.clear();
-				baseWindowReferenceCount.clear();
+				overlappingWindowReferenceCount.clear();
 			} else {
-				baseWindowReferenceCount.update(referenceCount - 1);
+				overlappingWindowReferenceCount.update(referenceCount - 1);
 			}
 		}
 		windowStateReference.clear();

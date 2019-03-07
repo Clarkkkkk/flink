@@ -54,6 +54,8 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 
 	private final long greatestCommonDivisor;
 
+	private TimeWindow latestOverlapWindow;
+
 	private SlidingProcessingTimeWindows(long size, long slide, long offset) {
 		if (offset < 0 || offset >= slide || size <= 0) {
 			throw new IllegalArgumentException("SlidingProcessingTimeWindows parameters must satisfy 0 <= offset < slide and size > 0");
@@ -71,9 +73,8 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 		List<TimeWindow> windows = new ArrayList<>((int) (size / slide));
 
 		// Get the base window and add it at the first of collection of windows
-		long baseWindowStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, greatestCommonDivisor);
-		TimeWindow baseWindow = new TimeWindow(baseWindowStart, baseWindowStart + greatestCommonDivisor);
-		windows.add(baseWindow);
+		long overlapWindowStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, greatestCommonDivisor);
+		latestOverlapWindow = new TimeWindow(overlapWindowStart, overlapWindowStart + greatestCommonDivisor);
 
 		long lastStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, slide);
 		for (long start = lastStart;
@@ -82,6 +83,11 @@ public class SlidingProcessingTimeWindows extends SlidingWindowAssigner<Object, 
 			windows.add(new TimeWindow(start, start + size));
 		}
 		return windows;
+	}
+
+	@Override
+	public TimeWindow getLatestOverlappingWindow() {
+		return latestOverlapWindow;
 	}
 
 	public long getSize() {

@@ -133,7 +133,6 @@ public class WindowOperatorTest extends TestLogger {
 		testHarness.processWatermark(new Watermark(999));
 		expectedOutput.add(new StreamRecord<>(new Tuple2<>("key1", 3), 999));
 		expectedOutput.add(new Watermark(999));
-		ConcurrentLinkedQueue<Object> output = testHarness.getOutput();
 		TestHarnessUtil.assertOutputEqualsSorted("Output was not correct.", expectedOutput, testHarness.getOutput(), new Tuple2ResultSortComparator());
 
 		testHarness.processWatermark(new Watermark(1999));

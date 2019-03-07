@@ -25,4 +25,6 @@ import org.apache.flink.streaming.api.windowing.windows.Window;
  */
 public abstract class SlidingWindowAssigner<T, W extends Window> extends WindowAssigner<T, W> {
 
+	public abstract W getLatestOverlappingWindow();
+
 }

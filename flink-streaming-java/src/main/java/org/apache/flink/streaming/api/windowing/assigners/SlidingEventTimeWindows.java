@@ -56,6 +56,8 @@ public class SlidingEventTimeWindows extends SlidingWindowAssigner<Object, TimeW
 
 	private final long greatestCommonDivisor;
 
+	private TimeWindow latestOverlapWindow;
+
 	protected SlidingEventTimeWindows(long size, long slide, long offset) {
 		if (offset < 0 || offset >= slide || size <= 0) {
 			throw new IllegalArgumentException("SlidingEventTimeWindows parameters must satisfy 0 <= offset < slide and size > 0");
@@ -73,9 +75,8 @@ public class SlidingEventTimeWindows extends SlidingWindowAssigner<Object, TimeW
 			List<TimeWindow> windows = new ArrayList<>((int) (size / slide));
 
 			// Get the base window and add it at the first of collection of windows
-			long baseWindowStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, greatestCommonDivisor);
-			TimeWindow baseWindow = new TimeWindow(baseWindowStart, baseWindowStart + greatestCommonDivisor);
-			windows.add(baseWindow);
+			long overlapWindowStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, greatestCommonDivisor);
+			latestOverlapWindow = new TimeWindow(overlapWindowStart, overlapWindowStart + greatestCommonDivisor);
 
 			long lastStart = TimeWindow.getWindowStartWithOffset(timestamp, offset, slide);
 			for (long start = lastStart;
@@ -89,6 +90,11 @@ public class SlidingEventTimeWindows extends SlidingWindowAssigner<Object, TimeW
 					"Is the time characteristic set to 'ProcessingTime', or did you forget to call " +
 					"'DataStream.assignTimestampsAndWatermarks(...)'?");
 		}
+	}
+
+	@Override
+	public TimeWindow getLatestOverlappingWindow() {
+		return latestOverlapWindow;
 	}
 
 	public long getSize() {
@@ -153,4 +159,5 @@ public class SlidingEventTimeWindows extends SlidingWindowAssigner<Object, TimeW
 	public boolean isEventTime() {
 		return true;
 	}
+
 }
