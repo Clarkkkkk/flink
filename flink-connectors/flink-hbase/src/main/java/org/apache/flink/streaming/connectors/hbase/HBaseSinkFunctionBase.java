@@ -213,7 +213,7 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 							testException = e;
 						}
 						long end = System.currentTimeMillis();
-						log.debug("ClarkTest: Flush tasks " + (end - start) + " milliseconds with exception: " + testException);
+						log.debug("Flush tasks " + (end - start) + " milliseconds with exception: " + testException);
 					}
 				}
 			}
@@ -268,14 +268,14 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 			CompletableFuture<Void> flushFuture = FutureUtils
 				.retry(() -> CompletableFuture.runAsync(() -> flushToHBase(), flushExecutor), batchFlushMaxRetries, flushExecutor);
 			if (!flushFuture.isDone()) {
-				log.debug("ClarkTest: start to wait for flush futre");
+				log.debug("start to wait for flush futre");
 				flushFuture.get(batchFlushMaxTimeoutMillis, TimeUnit.MILLISECONDS);
 			}
 		} catch (TimeoutException e) {
 			throw new RuntimeException("Flush operation to HBase cannot be finished.", e);
 		}
 		long end = System.currentTimeMillis();
-		log.debug("ClarkTest: takes " + (end - start) + " ms");
+		log.debug("takes " + (end - start) + " ms");
 	}
 
 	private void flushToHBase() {
@@ -284,7 +284,7 @@ public abstract class HBaseSinkFunctionBase<IN> extends RichSinkFunction<IN> imp
 				if (hTable == null) {
 					log.error("HBase table cannot be null during flush.");
 				} else {
-					log.debug("ClarkTest: mutation size is " + mutaionBuffer.size());
+					log.debug("mutation size is " + mutaionBuffer.size());
 					hTable.batch(mutaionBuffer, new Object[mutaionBuffer.size()]);
 					mutaionBuffer.clear();
 					estimateSize = 0;
